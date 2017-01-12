@@ -1,1 +1,0 @@
-This is a windows service to perform auto ticketing process.

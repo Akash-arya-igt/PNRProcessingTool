@@ -1,0 +1,118 @@
+﻿@model IEnumerable<IGT.PNRProcessing.BusinessEntities.GetTicketingFlowSettings>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.PCCName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FlowName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PreFormatedRemark)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CommissionPct)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CommissionRemarkFormat)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AllowedFOPId)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AllowedFareType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsCheckAVL)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsCheckMCT)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SuccessQ)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.SuccessMsg)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FailQ)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FailMsg)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TargetQNo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ScanFrequency)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.PCCName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FlowName)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PreFormatedRemark)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CommissionPct)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.CommissionRemarkFormat)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AllowedFOPId)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.AllowedFareType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsCheckAVL)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsCheckMCT)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SuccessQ)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.SuccessMsg)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FailQ)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.FailMsg)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TargetQNo)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ScanFrequency)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+        </td>
+    </tr>
+}
+
+</table>

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<IGT.PNRProcessing.BusinessEntities.GetHAPDetail>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.PCCID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.PCC)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.GDS)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Profile)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.UserID)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Password)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.GWSConnURL)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.PCCID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.PCC)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.GDS)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Profile)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UserID)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Password)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.GWSConnURL)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new {  id=item.PCCID }) |
+            @Html.ActionLink("Details", "Details", new { id = item.PCCID }) |
+            @Html.ActionLink("Delete", "Delete", new { id = item.PCCID })
+        </td>
+    </tr>
+}
+
+</table>

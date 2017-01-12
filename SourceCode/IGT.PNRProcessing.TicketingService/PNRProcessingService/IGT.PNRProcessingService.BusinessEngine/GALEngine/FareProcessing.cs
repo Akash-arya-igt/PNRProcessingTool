@@ -1,0 +1,358 @@
+﻿using System;
+using System.Xml;
+using System.Linq;
+using System.Collections.Generic;
+using IGT.PNRProcessingService.GWSConnection;
+using IGT.PNRProcessingService.BusinessEntities;
+using IGT.PNRProcessingService.BusinessEngine.DALEngine;
+using IGT.PNRProcessingService.BusinessEngine.CommonUtil;
+
+namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
+{
+    public enum TypeOfFare
+    {
+        Unspecified,
+        Private,
+        Published
+    }
+
+    public class FareProcessing
+    {
+        private string _fareInfoRequest = "DisplayFareInfo.xml";
+        private string _fareDetailRequest = "DisplayFareDetails.xml";
+        private string _ticketIssuanceCash = "IssueTicketForCash.xml";
+        private string _retrievePNRRequest = "RetrieveExistingPNR.xml";
+        public enum RequestAction
+        {
+            I,
+            D
+        }
+
+        public XmlElement RetrievePNR(GetHAPDetail _pHAP, string _pRecloc, string _pSession)
+        {
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_retrievePNRRequest);
+            reqTemplate.SetNodeTextIfExist("//RecLoc", _pRecloc);
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            XmlElement response = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+            return response;
+        }
+
+        public XmlElement GetFareInfo(GetHAPDetail _pHAP, string _pRecloc, out string _oSession)
+        {
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_fareInfoRequest);
+            reqTemplate.SetNodeTextIfExist("//RecLoc", _pRecloc);
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            XmlElement response = objGwsConn.SubmitXmlOnSession(reqTemplate.DocumentElement);
+            _oSession = objGwsConn.Session;
+            return response;
+        }
+
+        public XmlElement GetFareInfoInSession(GetHAPDetail _pHAP, string _pRecloc, string _pSession)
+        {
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_fareInfoRequest);
+            reqTemplate.SetNodeTextIfExist("//RecLoc", _pRecloc);
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            objGwsConn.Session = _pSession;
+            XmlElement response = objGwsConn.SubmitXmlOnSession(reqTemplate.DocumentElement);
+
+            return response;
+        }
+
+        public XmlElement GetFareDetail(GetHAPDetail _pHAP, string _pRecloc, string _pFareNum)
+        {
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_fareDetailRequest);
+            reqTemplate.SetNodeTextIfExist("//RecLoc", _pRecloc);
+            reqTemplate.SetNodeTextIfExist("//FareNum", _pFareNum);
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            return objGwsConn.SubmitXml(reqTemplate.DocumentElement);
+        }
+
+        public string CheckMCTError(string _pSessionID, GetHAPDetail _pHAP)
+        {
+            string strMCTError = string.Empty;
+            string s = ConfigUtil.GetConfigValue("MCTErrorPattern", "CHECK MINIMUM CONNECT TIME");
+            string[] patterns = s.Split(',');
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            string misConectionResp = objGwsConn.SubmitTermainalCmd(_pSessionID, "@MT");
+            foreach (string pattern in patterns)
+            {
+                if (misConectionResp.Contains(pattern))
+                {
+                    strMCTError = misConectionResp.Replace(">>", "");
+                    break;
+                }
+            }
+
+            return strMCTError;
+        }
+
+
+        public bool IsFOPTypeSupported(XmlElement _pPNRXml, string _pSupportedFOP)
+        {
+            if (!string.IsNullOrEmpty(_pSupportedFOP))
+            {
+                XmlNode otherFOPNode = _pPNRXml.SelectSingleNode("//OtherFOP");
+                XmlNode creditCardNode = _pPNRXml.SelectSingleNode("//CreditCardFOP");
+                XmlNode checkFOPNode = _pPNRXml.SelectSingleNode("//CheckFOP");
+
+                try
+                {
+                    if (otherFOPNode != null)
+                    {
+                        string FOPId = otherFOPNode.SelectSingleNode("ID").InnerText;
+                        if (!string.IsNullOrEmpty(FOPId))
+                        {
+                            if (_pSupportedFOP.Contains(FOPId))
+                                return true;
+                        }
+                    }
+                    else if (creditCardNode != null)
+                    {
+                        string creditCardFOPId = creditCardNode.SelectSingleNode("ID").InnerText;
+                        if (!string.IsNullOrEmpty(creditCardFOPId))
+                        {
+                            if (_pSupportedFOP.Contains(creditCardFOPId))
+                                return true;
+                        }
+                    }
+                    else if (checkFOPNode != null)
+                    {
+                        string checkFOPId = checkFOPNode.SelectSingleNode("ID").InnerText;
+                        if (!string.IsNullOrEmpty(checkFOPId))
+                        {
+                            if (_pSupportedFOP.Contains(checkFOPId))
+                                return true;
+                        }
+                    }
+                }
+                finally
+                {
+                    otherFOPNode = null;
+                    creditCardNode = null;
+                    checkFOPNode = null;
+                }
+            }
+            return false;
+        }
+        public TypeOfFare GetFareType(GetHAPDetail _pHAP, string _pRecloc, string _pSession)
+        {
+
+            XmlElement fareInfo = GetFareInfoInSession(_pHAP, _pRecloc, _pSession);
+            TypeOfFare fareType = TypeOfFare.Unspecified;
+
+            if (fareInfo != null)
+            {
+                try
+                {
+                    XmlNodeList extendedQuoteList = fareInfo.SelectNodes("//DocProdDisplayStoredQuote/ExtendedQuoteInformation");
+
+                    if (extendedQuoteList != null)
+                    {
+                        string fareInd = string.Empty;
+                        foreach (XmlNode netFareIndicator in extendedQuoteList)
+                        {
+                            if (netFareIndicator != null)
+                            {
+                                if (string.IsNullOrEmpty(fareInd))
+                                    fareInd = netFareIndicator.SelectSingleNode("NetFareInd").InnerText;
+
+                                if (fareInd != netFareIndicator.SelectSingleNode("NetFareInd").InnerText)
+                                {
+                                    fareType = TypeOfFare.Unspecified;
+                                    break;
+                                }
+                                else if (fareInd == "Y")
+                                    fareType = TypeOfFare.Private;
+                                else
+                                    fareType = TypeOfFare.Published;
+                            }
+                            else
+                            {
+                                fareType = TypeOfFare.Published;
+                            }
+                        }
+                    }
+
+                    extendedQuoteList = null;
+                }
+                catch
+                {
+                    fareType = TypeOfFare.Unspecified;
+                }
+            }
+            return fareType;
+        }
+
+        public void IssueTicket(GetHAPDetail _pHAP, string _pRecloc, string _pTraceId)
+        {
+            string strSession;
+            int intNoOfFares = 0;
+            List<string> lstErrors;
+            FareProcessing objFareProcessing = new FareProcessing();
+            PNRProcessingAction objProcessTrace = new PNRProcessingAction();
+
+            try
+            {
+                if (objProcessTrace.GetProcessingStatus(_pTraceId) == BusinessEntities.PNRProcessingStatus.Recorded.ToString())
+                {
+                    XmlElement response = objFareProcessing.GetFareInfo(_pHAP, _pRecloc, out strSession);
+
+                    if (response != null)
+                        intNoOfFares = response.SelectNodes("//GenQuoteDetails").Count;
+
+                    if (intNoOfFares == 0)
+                    {
+                        objProcessTrace.UpdateProcessingStatus(_pTraceId, BusinessEntities.PNRProcessingStatus.Completed, "NO FARES", 0, 0, true);
+                        throw new Exception("NO FARES");
+                    }
+                    else
+                        objProcessTrace.UpdateProcessingStatus(_pTraceId, BusinessEntities.PNRProcessingStatus.InProgress, string.Empty, intNoOfFares, 0, false);
+
+                    string strTransType = "TK"; // "MR" of multiple FOP
+
+                    for (int i = 1; i <= intNoOfFares; i++)
+                    {
+                        if (i != 1)
+                            objFareProcessing.RetrievePNR(_pHAP, _pRecloc, strSession);
+
+                        objFareProcessing.IssueTicketToFare(_pHAP, i.ToString(), strTransType, strSession, out lstErrors);
+
+                        if (lstErrors.Count > 0)
+                        {
+                            objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.Completed, lstErrors[0], intNoOfFares, i - 1, true);
+                            throw new Exception(lstErrors[0]);
+                        }
+
+                        if (i == intNoOfFares)
+                            objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.Completed, string.Empty, intNoOfFares, i, true);
+                        else
+                            objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.InProgress, string.Empty, intNoOfFares, i, false);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.Completed, ex.Message, true);
+                throw ex;
+            }
+        }
+
+        public XmlElement IssueTicketToFare(GetHAPDetail _pHAP, string _pFareNum, string _pTransType, string _pSession, out List<string> lstErrorMsg)
+        {
+            string strErrorMsg = string.Empty;
+            lstErrorMsg = new List<string>();
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_ticketIssuanceCash);
+            reqTemplate.SetNodeTextIfExist("//FareNum", _pFareNum);
+            reqTemplate.SetNodeTextIfExist("//TransType", _pTransType);
+            reqTemplate.RemoveChildIfExist("//CommissionMod");
+            reqTemplate.RemoveChildIfExist("//NettFare");
+            reqTemplate.RemoveChildIfExist("//CheckFOP");
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+
+            XmlElement request = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+            strErrorMsg = GetErrorsFromNodesWithErrorCode(request);
+            if (!string.IsNullOrEmpty(strErrorMsg))
+                lstErrorMsg.Add(strErrorMsg);
+
+            strErrorMsg = string.Empty;
+            strErrorMsg = GetErrorsFromNodesWithErrText(request);
+            if (!string.IsNullOrEmpty(strErrorMsg))
+                lstErrorMsg.Add(strErrorMsg);
+
+            strErrorMsg = string.Empty;
+            strErrorMsg = GetErrorsFromNodesWithErrorFault(request);
+            if (!string.IsNullOrEmpty(strErrorMsg))
+                lstErrorMsg.Add(strErrorMsg);
+
+            return request;
+        }
+
+        public string GetErrorsFromNodesWithErrorCode(XmlElement responseDoc)
+        {
+            string sErrorNodesPath = "//ErrorCode";
+            return GetErrorsFromErrorNodes(responseDoc, sErrorNodesPath);
+        }
+
+        public string GetErrorsFromNodesWithErrText(XmlElement responseDoc)
+        {
+            string sErrorNodesPath = "//ErrText";
+            return GetErrorsFromErrorNodes(responseDoc, sErrorNodesPath);
+        }
+
+        public string GetErrorsFromNodesWithErrorFault(XmlElement responseDoc)
+        {
+            string sErrorNodesPath = "//ErrorFault";
+            return GetErrorsFromErrorNodes(responseDoc, sErrorNodesPath);
+        }
+
+        private string GetErrorsFromErrorNodes(XmlElement responseDoc, string sErrorNodesPath)
+        {
+            return GetErrorsFromErrorNodes(responseDoc, sErrorNodesPath, null, null);
+        }
+
+        public string GetErrorsFromErrorNodes(XmlElement responseDoc, string sErrorNodesPath, List<string> excludeParentNodesNames, List<string> skipMessagesPatterns)
+        {
+            string sRet = "";
+
+            /*TODO: recognize error like the following 
+             <PNRBFSecondaryBldChg>
+              <Len>53</Len> 
+              <RecID>EROR</RecID> 
+              <AryCnt>0</AryCnt> 
+              <DelimiterCharacter>F</DelimiterCharacter> 
+              <LevelNum>0</LevelNum> 
+              <VersionNum>1</VersionNum> 
+              <Err /> 
+            - <DataBlkInd>
+            - <![CDATA[   O
+              ]]> 
+              </DataBlkInd>
+              <InsertedTextAry /> 
+              <Text>INVALID CHARACTER IN TEXT</Text> 
+              </PNRBFSecondaryBldChg>
+
+             */
+            XmlNodeList nodeList = responseDoc.SelectNodes(sErrorNodesPath);//eg "Ticketing/ErrText");
+            foreach (XmlNode errNode1 in nodeList)
+            {
+                if (errNode1 != null)
+                {
+                    string sParentName = "";
+                    if (errNode1.ParentNode != null)
+                    {
+                        sParentName = errNode1.ParentNode.Name;
+                        if (excludeParentNodesNames != null && excludeParentNodesNames.Where(x => !string.IsNullOrEmpty(x)).Count() > 0)
+                        {
+                            if (excludeParentNodesNames.Contains(sParentName))
+                            {
+                                continue;
+                            }
+                        }
+                    }
+                    if (skipMessagesPatterns != null && skipMessagesPatterns.Where(x => !string.IsNullOrEmpty(x)).Count() > 0)
+                    {
+                        string sMsg = errNode1.InnerText;
+                        string sPattern = skipMessagesPatterns.Find(sMsg.Contains);
+                        if (!String.IsNullOrEmpty(sPattern))
+                        {
+                            //sMsg = sPattern;//return pattern instead of message???
+                            continue;
+                        }
+                    }
+                    //example of ErrText <ErrText><Err>D0002308</Err><KlrInErr>0000</KlrInErr><InsertedTextAry></InsertedTextAry><Text>NO FARES</Text></ErrText>
+                    string shortText = XMLUtil.GetStringChildNode(errNode1, "Text");
+                    sRet += shortText;// +String.Format(" Error in node:{0}  {1}\n", sParentName, errNode1.OuterXml);
+                    //sRet += shortText + String.Format(" Error in node:{0}  {1}\n", sParentName, errNode1.OuterXml);
+                }
+            }
+            return sRet;
+        }
+    }
+}
