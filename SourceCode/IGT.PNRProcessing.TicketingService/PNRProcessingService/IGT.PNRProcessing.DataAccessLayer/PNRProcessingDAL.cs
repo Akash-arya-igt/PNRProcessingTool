@@ -114,14 +114,16 @@ namespace IGT.PNRProcessing.DataAccessLayer
                 var ProcessingTrace = (from lst in dbctx.tblPNRProcessingTraces
                                        where lst.PNRProcessingTraceId == _pTraceID
                                        select lst).FirstOrDefault();
+                if (ProcessingTrace != null)
+                {
+                    ProcessingTrace.Status = _pStatus.ToString();
+                    ProcessingTrace.Error = _pError;
+                    ProcessingTrace.IsProcessComplete = _pIsProcessCompleted;
+                    ProcessingTrace.LastModified = DateTime.Now;
 
-                ProcessingTrace.Status = _pStatus.ToString();
-                ProcessingTrace.Error = _pError;
-                ProcessingTrace.IsProcessComplete = _pIsProcessCompleted;
-                ProcessingTrace.LastModified = DateTime.Now;
-
-                dbctx.Entry(ProcessingTrace).State = EntityState.Modified;
-                dbctx.SaveChanges();
+                    dbctx.Entry(ProcessingTrace).State = EntityState.Modified;
+                    dbctx.SaveChanges();
+                }
             }
         }
 

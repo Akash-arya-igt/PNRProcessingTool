@@ -10,6 +10,7 @@ namespace IGT.PNRProcessing.BusinessEntities
     {
         public int PCCID { get; set; }
         public string PCC { get; set; }
+        public string DisplayPCCName { get; set; }
         public string GDS { get; set; }
         public string Profile { get; set; }
         public string UserID { get; set; }

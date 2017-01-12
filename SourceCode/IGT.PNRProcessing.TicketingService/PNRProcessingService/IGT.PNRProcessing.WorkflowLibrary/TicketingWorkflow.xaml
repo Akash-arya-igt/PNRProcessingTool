@@ -132,9 +132,14 @@
                 <While.Condition>
                   <mca:CSharpValue x:TypeArguments="x:Boolean">CurrentQCount &gt; 0</mca:CSharpValue>
                 </While.Condition>
-                <Sequence sap2010:WorkflowViewState.IdRef="Sequence_5">
+                <Sequence sap2010:WorkflowViewState.IdRef="Sequence_6">
                   <Sequence DisplayName="PNRValidationSequence" sap2010:WorkflowViewState.IdRef="Sequence_4">
-                    <ipa:CheckPNRValidityActivity AllowedFareType="{x:Null}" sap2010:WorkflowViewState.IdRef="CheckPNRValidityActivity_1">
+                    <ipa:CheckPNRValidityActivity sap2010:WorkflowViewState.IdRef="CheckPNRValidityActivity_1">
+                      <ipa:CheckPNRValidityActivity.AllowedFareType>
+                        <InArgument x:TypeArguments="x:String">
+                          <mca:CSharpValue x:TypeArguments="x:String">TicketingFlowSetting.AllowedFareType</mca:CSharpValue>
+                        </InArgument>
+                      </ipa:CheckPNRValidityActivity.AllowedFareType>
                       <ipa:CheckPNRValidityActivity.HAPSetting>
                         <InArgument x:TypeArguments="ipb:GetHAPDetail">
                           <mca:CSharpValue x:TypeArguments="ipb:GetHAPDetail">TicketingFlowSetting.HAPDetail</mca:CSharpValue>
@@ -210,7 +215,7 @@
                                   <FlowDecision.True>
                                     <FlowDecision x:Name="__ReferenceID4" DisplayName="IsMCTError" sap2010:WorkflowViewState.IdRef="FlowDecision_3">
                                       <FlowDecision.Condition>
-                                        <mca:CSharpValue x:TypeArguments="x:Boolean">IsMCTError</mca:CSharpValue>
+                                        <mca:CSharpValue x:TypeArguments="x:Boolean">!IsMCTError</mca:CSharpValue>
                                       </FlowDecision.Condition>
                                       <FlowDecision.True>
                                         <FlowStep x:Name="__ReferenceID9" sap2010:WorkflowViewState.IdRef="FlowStep_1">
@@ -250,6 +255,27 @@
                                                   <InArgument x:TypeArguments="x:Boolean">True</InArgument>
                                                 </Assign.Value>
                                               </Assign>
+                                              <FlowStep.Next>
+                                                <FlowStep x:Name="__ReferenceID10" sap2010:WorkflowViewState.IdRef="FlowStep_7">
+                                                  <ipa:UpdateTicketingDetailInDB sap2010:WorkflowViewState.IdRef="UpdateTicketingDetailInDB_1" IsCompleted="True">
+                                                    <ipa:UpdateTicketingDetailInDB.ErrorOccured>
+                                                      <InArgument x:TypeArguments="x:String">
+                                                        <mca:CSharpValue x:TypeArguments="x:String">ErrorOccured</mca:CSharpValue>
+                                                      </InArgument>
+                                                    </ipa:UpdateTicketingDetailInDB.ErrorOccured>
+                                                    <ipa:UpdateTicketingDetailInDB.ProcessingStatus>
+                                                      <InArgument x:TypeArguments="ipb:PNRProcessingStatus">
+                                                        <mca:CSharpValue x:TypeArguments="ipb:PNRProcessingStatus">PNRProcessingStatus.Completed</mca:CSharpValue>
+                                                      </InArgument>
+                                                    </ipa:UpdateTicketingDetailInDB.ProcessingStatus>
+                                                    <ipa:UpdateTicketingDetailInDB.TraceID>
+                                                      <InArgument x:TypeArguments="x:String">
+                                                        <mca:CSharpValue x:TypeArguments="x:String">TraceID</mca:CSharpValue>
+                                                      </InArgument>
+                                                    </ipa:UpdateTicketingDetailInDB.TraceID>
+                                                  </ipa:UpdateTicketingDetailInDB>
+                                                </FlowStep>
+                                              </FlowStep.Next>
                                             </FlowStep>
                                           </FlowStep.Next>
                                         </FlowStep>
@@ -323,6 +349,7 @@
                       <x:Reference>__ReferenceID8</x:Reference>
                       <x:Reference>__ReferenceID0</x:Reference>
                       <x:Reference>__ReferenceID9</x:Reference>
+                      <x:Reference>__ReferenceID10</x:Reference>
                     </Flowchart>
                     <If DisplayName="IssueTicket" sap2010:WorkflowViewState.IdRef="If_2">
                       <If.Condition>
@@ -352,11 +379,26 @@
                               <mca:CSharpReference x:TypeArguments="x:Boolean">IsErrorOccured</mca:CSharpReference>
                             </OutArgument>
                           </ipa:IssueTicketActivity.IsErrorOccured>
+                          <ipa:IssueTicketActivity.PNRXml>
+                            <OutArgument x:TypeArguments="sx:XmlElement">
+                              <mca:CSharpReference x:TypeArguments="sx:XmlElement">PNRXml</mca:CSharpReference>
+                            </OutArgument>
+                          </ipa:IssueTicketActivity.PNRXml>
                           <ipa:IssueTicketActivity.Recloc>
                             <InArgument x:TypeArguments="x:String">
                               <mca:CSharpValue x:TypeArguments="x:String">CurrentRecloc</mca:CSharpValue>
                             </InArgument>
                           </ipa:IssueTicketActivity.Recloc>
+                          <ipa:IssueTicketActivity.Session>
+                            <InArgument x:TypeArguments="x:String">
+                              <mca:CSharpValue x:TypeArguments="x:String">CurrentSession</mca:CSharpValue>
+                            </InArgument>
+                          </ipa:IssueTicketActivity.Session>
+                          <ipa:IssueTicketActivity.SuccessRemark>
+                            <InArgument x:TypeArguments="x:String">
+                              <mca:CSharpValue x:TypeArguments="x:String">TicketingFlowSetting.SuccessMsg</mca:CSharpValue>
+                            </InArgument>
+                          </ipa:IssueTicketActivity.SuccessRemark>
                           <ipa:IssueTicketActivity.TraceID>
                             <InArgument x:TypeArguments="x:String">
                               <mca:CSharpValue x:TypeArguments="x:String">TraceID</mca:CSharpValue>
@@ -365,94 +407,75 @@
                         </ipa:IssueTicketActivity>
                       </If.Then>
                     </If>
-                    <If DisplayName="MoveToQ">
+                    <If DisplayName="MoveToQ" sap2010:WorkflowViewState.IdRef="If_3">
                       <If.Condition>
                         <InArgument x:TypeArguments="x:Boolean">
-                          <mca:CSharpValue x:TypeArguments="x:Boolean">!IsErrorOccured</mca:CSharpValue>
+                          <mca:CSharpValue x:TypeArguments="x:Boolean">IsErrorOccured</mca:CSharpValue>
                         </InArgument>
                       </If.Condition>
                       <If.Then>
-                        <ipa:PNRMoveToQActivity>
-                          <ipa:PNRMoveToQActivity.HAPSetting>
-                            <InArgument x:TypeArguments="ipb:GetHAPDetail">
-                              <mca:CSharpValue x:TypeArguments="ipb:GetHAPDetail">TicketingFlowSetting.HAPDetail</mca:CSharpValue>
-                            </InArgument>
-                          </ipa:PNRMoveToQActivity.HAPSetting>
-                          <ipa:PNRMoveToQActivity.PNRXml>
-                            <OutArgument x:TypeArguments="sx:XmlElement">
-                              <mca:CSharpReference x:TypeArguments="sx:XmlElement">PNRXml</mca:CSharpReference>
-                            </OutArgument>
-                          </ipa:PNRMoveToQActivity.PNRXml>
-                          <ipa:PNRMoveToQActivity.Recloc>
-                            <OutArgument x:TypeArguments="x:String">
-                              <mca:CSharpReference x:TypeArguments="x:String">CurrentRecloc</mca:CSharpReference>
-                            </OutArgument>
-                          </ipa:PNRMoveToQActivity.Recloc>
-                          <ipa:PNRMoveToQActivity.Remark>
-                            <InArgument x:TypeArguments="x:String">
-                              <mca:CSharpValue x:TypeArguments="x:String">TicketingFlowSetting.SuccessMsg</mca:CSharpValue>
-                            </InArgument>
-                          </ipa:PNRMoveToQActivity.Remark>
-                          <ipa:PNRMoveToQActivity.Session>
-                            <InArgument x:TypeArguments="x:String">
-                              <mca:CSharpValue x:TypeArguments="x:String">CurrentSession</mca:CSharpValue>
-                            </InArgument>
-                          </ipa:PNRMoveToQActivity.Session>
-                          <ipa:PNRMoveToQActivity.ToQueueNumber>
-                            <InArgument x:TypeArguments="x:Int32">
-                              <mca:CSharpValue x:TypeArguments="x:Int32">TicketingFlowSetting.SuccessQ</mca:CSharpValue>
-                            </InArgument>
-                          </ipa:PNRMoveToQActivity.ToQueueNumber>
-                          <ipa:PNRMoveToQActivity.TraceID>
-                            <OutArgument x:TypeArguments="x:String">
-                              <mca:CSharpReference x:TypeArguments="x:String">TraceID</mca:CSharpReference>
-                            </OutArgument>
-                          </ipa:PNRMoveToQActivity.TraceID>
-                          <sap2010:WorkflowViewState.IdRef>PNRMoveToQActivity_1</sap2010:WorkflowViewState.IdRef>
-                        </ipa:PNRMoveToQActivity>
+                        <Sequence sap2010:WorkflowViewState.IdRef="Sequence_7">
+                          <ipa:PNRMoveToQActivity sap2010:WorkflowViewState.IdRef="PNRMoveToQActivity_1">
+                            <ipa:PNRMoveToQActivity.HAPSetting>
+                              <InArgument x:TypeArguments="ipb:GetHAPDetail">
+                                <mca:CSharpValue x:TypeArguments="ipb:GetHAPDetail">TicketingFlowSetting.HAPDetail</mca:CSharpValue>
+                              </InArgument>
+                            </ipa:PNRMoveToQActivity.HAPSetting>
+                            <ipa:PNRMoveToQActivity.PNRXml>
+                              <OutArgument x:TypeArguments="sx:XmlElement">
+                                <mca:CSharpReference x:TypeArguments="sx:XmlElement">PNRXml</mca:CSharpReference>
+                              </OutArgument>
+                            </ipa:PNRMoveToQActivity.PNRXml>
+                            <ipa:PNRMoveToQActivity.Remark>
+                              <InArgument x:TypeArguments="x:String">
+                                <mca:CSharpValue x:TypeArguments="x:String">TicketingFlowSetting.FailMsg</mca:CSharpValue>
+                              </InArgument>
+                            </ipa:PNRMoveToQActivity.Remark>
+                            <ipa:PNRMoveToQActivity.Session>
+                              <InArgument x:TypeArguments="x:String">
+                                <mca:CSharpValue x:TypeArguments="x:String">CurrentSession</mca:CSharpValue>
+                              </InArgument>
+                            </ipa:PNRMoveToQActivity.Session>
+                            <ipa:PNRMoveToQActivity.ToQueueNumber>
+                              <InArgument x:TypeArguments="x:Int32">
+                                <mca:CSharpValue x:TypeArguments="x:Int32">TicketingFlowSetting.FailQ</mca:CSharpValue>
+                              </InArgument>
+                            </ipa:PNRMoveToQActivity.ToQueueNumber>
+                          </ipa:PNRMoveToQActivity>
+                        </Sequence>
                       </If.Then>
                       <If.Else>
-                        <ipa:PNRMoveToQActivity>
-                          <ipa:PNRMoveToQActivity.HAPSetting>
+                        <ipa:EndTransactNRetrieveActivity sap2010:WorkflowViewState.IdRef="EndTransactNRetrieveActivity_1">
+                          <ipa:EndTransactNRetrieveActivity.HAPSetting>
                             <InArgument x:TypeArguments="ipb:GetHAPDetail">
                               <mca:CSharpValue x:TypeArguments="ipb:GetHAPDetail">TicketingFlowSetting.HAPDetail</mca:CSharpValue>
                             </InArgument>
-                          </ipa:PNRMoveToQActivity.HAPSetting>
-                          <ipa:PNRMoveToQActivity.PNRXml>
+                          </ipa:EndTransactNRetrieveActivity.HAPSetting>
+                          <ipa:EndTransactNRetrieveActivity.PNRXml>
                             <OutArgument x:TypeArguments="sx:XmlElement">
                               <mca:CSharpReference x:TypeArguments="sx:XmlElement">PNRXml</mca:CSharpReference>
                             </OutArgument>
-                          </ipa:PNRMoveToQActivity.PNRXml>
-                          <ipa:PNRMoveToQActivity.Recloc>
-                            <OutArgument x:TypeArguments="x:String">
-                              <mca:CSharpReference x:TypeArguments="x:String">CurrentRecloc</mca:CSharpReference>
-                            </OutArgument>
-                          </ipa:PNRMoveToQActivity.Recloc>
-                          <ipa:PNRMoveToQActivity.Remark>
-                            <InArgument x:TypeArguments="x:String">
-                              <mca:CSharpValue x:TypeArguments="x:String">TicketingFlowSetting.FailMsg</mca:CSharpValue>
-                            </InArgument>
-                          </ipa:PNRMoveToQActivity.Remark>
-                          <ipa:PNRMoveToQActivity.Session>
+                          </ipa:EndTransactNRetrieveActivity.PNRXml>
+                          <ipa:EndTransactNRetrieveActivity.Session>
                             <InArgument x:TypeArguments="x:String">
                               <mca:CSharpValue x:TypeArguments="x:String">CurrentSession</mca:CSharpValue>
                             </InArgument>
-                          </ipa:PNRMoveToQActivity.Session>
-                          <ipa:PNRMoveToQActivity.ToQueueNumber>
-                            <InArgument x:TypeArguments="x:Int32">
-                              <mca:CSharpValue x:TypeArguments="x:Int32">TicketingFlowSetting.FailQ</mca:CSharpValue>
-                            </InArgument>
-                          </ipa:PNRMoveToQActivity.ToQueueNumber>
-                          <ipa:PNRMoveToQActivity.TraceID>
-                            <OutArgument x:TypeArguments="x:String">
-                              <mca:CSharpReference x:TypeArguments="x:String">TraceID</mca:CSharpReference>
-                            </OutArgument>
-                          </ipa:PNRMoveToQActivity.TraceID>
-                          <sap2010:WorkflowViewState.IdRef>PNRMoveToQActivity_2</sap2010:WorkflowViewState.IdRef>
-                        </ipa:PNRMoveToQActivity>
+                          </ipa:EndTransactNRetrieveActivity.Session>
+                        </ipa:EndTransactNRetrieveActivity>
                       </If.Else>
-                      <sap2010:WorkflowViewState.IdRef>If_3</sap2010:WorkflowViewState.IdRef>
                     </If>
+                    <Assign sap2010:WorkflowViewState.IdRef="Assign_7">
+                      <Assign.To>
+                        <OutArgument x:TypeArguments="x:Int32">
+                          <mca:CSharpReference x:TypeArguments="x:Int32">CurrentQCount</mca:CSharpReference>
+                        </OutArgument>
+                      </Assign.To>
+                      <Assign.Value>
+                        <InArgument x:TypeArguments="x:Int32">
+                          <mca:CSharpValue x:TypeArguments="x:Int32">CurrentQCount-1</mca:CSharpValue>
+                        </InArgument>
+                      </Assign.Value>
+                    </Assign>
                   </Sequence>
                 </Sequence>
               </While>
@@ -478,14 +501,14 @@
         </Delay>
       </Sequence>
     </While>
-    <sads:DebugSymbol.Symbol>d5UBRDpcUHJvamVjdHNcUE5SUHJvY2Vzc2luZ1xTb3VyY2VDb2RlXElHVC5QTlJQcm9jZXNzaW5nLlRpY2tldGluZ1NlcnZpY2VcUE5SUHJvY2Vzc2luZ1NlcnZpY2VcSUdULlBOUlByb2Nlc3NpbmcuV29ya2Zsb3dMaWJyYXJ5XFRpY2tldGluZ1dvcmtmbG93LnhhbWxbPwPiAw4CAQFBNUE7AgECQwXgAw0CAQNHB98DEgIBE0UJRVQCAQRICVgeAwHaBlkJ2QMOAgEk2gMJ3gMRAgEUUA9QYQMB+QZLD0tzAwHqBlUPVWoDAdsGXA9cYgIBJWAN1wMYAgE03AMN3AOFAQIBFWEPbCsDAbsGbQ+CASMDAf4FgwEPygMXAgFUywMP1gMqAgE1aRVpaQMBywZkFWR5AwG8BnUVdWYDAawGfxV/YQMBnQZwFXB5AwGOBnoVenADAf8FhwERyQMcAgFkhQEThQFmAgFV0wMV0wNhAgFFzgMVzgN5AgE2iAETyAMeAgFliQEVwQE0AwHYBMIBFcYCIQMBtQPHAhXvAhoDAcoC8AIVxwMaAgFmpQEbpQFkAwHvBZYBG5YBbAMB4AWvARuvAW4DAdEFtAEbtAFnAwHCBaABG6ABegMBswWRARuRAWwDAaQFjAEbjAF/AwGVBbkBG7kBegMBhgW+ARu+AWgDAfcEqgEbqgF/AwHoBJsBG5sBcQMB2QTGAR3GAXQDAckEqwIftAIoAwG4BPMBL/wBOAMBpwTLASHLAWoDAZgEmAIjoQIsAwGHBNABJdABcwMB+AOFAieOAjADAecD1QEp1QFyAwHYA+cBK/ABNAMBxwPZASviATQDAbYDygIbygJpAwHLAs4CGe0CMwMB2gLzAhvzAmkCAWf3AhmcAzIDAeABnwMZxAMyAgF2sgJKsgJqAwHIBK4CJa4CdwMBuQT6AVv6AV8DAbcE9gE19gGKAQMBqASfAk6fAmADAZcEmwIpmwJ7AwGIBIwCUowCagMB9wOIAi2IAn8DAegD7gFW7gFnAwHXA+oBMeoBgwEDAcgD4AFX4AFcAwHGA9wBMdwBhgEDAbcD0QIf0QJ/AwGmA+UCH+UCagMBlwPgAh/gAnQDAYgD1gIf1gJxAwH5AtsCH9sCgwEDAeoC6gIf6gJkAwHbAv8CH/8CcAMBuwKEAx+EA3IDAawCjgMfjgNrAwGdAokDH4kDfAMBjgL6Ah/6AoMBAwH/AZgDH5gDbAMB8AGTAx+TA3kDAeEBpwMfpwNwAwHRAawDH6wDcgMBwgG2Ax+2A2sDAbMBsQMfsQN5AwGkAaIDH6IDgwEDAZUBwAMfwANsAwGGAbsDH7sDdgIBdw==</sads:DebugSymbol.Symbol>
+    <sads:DebugSymbol.Symbol>d5UBRDpcUHJvamVjdHNcUE5SUHJvY2Vzc2luZ1xTb3VyY2VDb2RlXElHVC5QTlJQcm9jZXNzaW5nLlRpY2tldGluZ1NlcnZpY2VcUE5SUHJvY2Vzc2luZ1NlcnZpY2VcSUdULlBOUlByb2Nlc3NpbmcuV29ya2Zsb3dMaWJyYXJ5XFRpY2tldGluZ1dvcmtmbG93LnhhbWxiPwP5Aw4CAQFBNUE7AgECQwX3Aw0CAQNHB/YDEgIBE0UJRVQCAQRICVgeAwGLB1kJ8AMOAgEk8QMJ9QMRAgEUUA9QYQMBqgdLD0tzAwGbB1UPVWoDAYwHXA9cYgIBJWAN7gMYAgE08wMN8wOFAQIBFWEPbCsDAewGbQ+CASMDAa8GgwEP4QMXAgFU4gMP7QMqAgE1aRVpaQMB/AZkFWR5AwHtBnUVdWYDAd0GfxV/YQMBzgZwFXB5AwG/BnoVenADAbAGhwER4AMcAgFkhQEThQFmAgFV6gMV6gNhAgFF5QMV5QN5AgE2iAET3wMeAgFliQEVxgE0AwH6BMcBFeECIQMBqAPiAhWZAxoDAZACmgMV0gMaAwGFAdMDFd4DHgIBZqoBG6oBZAMBoAabARubAWwDAZEGtAEbtAFuAwGCBrkBG7kBZwMB8wWlARulAXoDAeQFjAEbjAF9AwHVBZYBG5YBbAMBxgWRARuRAX8DAbcFvgEbvgF6AwGoBcMBG8MBaAMBmQWvARuvAX8DAYoFoAEboAFxAwH7BMsBHcsBdAMB6wTFAh/OAigDAdoE+AEvgQI4AwHJBIQCM5QCUwMBmgTQASHQAWoDAYsEsgIjuwIsAwH6A9UBJdUBcwMB6wOfAieoAjADAdoD2gEp2gFzAwHLA+wBK/UBNAMBugPeASvnATQDAakD5QIb5QJpAwGRAukCGZcDMwMBoAKdAxudA2gDAYYBoQMZvQMkAwHDAcADGdADPAMBlQHbAxvbA2cCAXbWAxvWA20CAWfMAkrMAmoDAeoEyAIlyAJ3AwHbBP8BW/8BXwMB2QT7ATX7AYoBAwHKBIwCOYwCowEDAboEhAKcAYQCogEDAbkEkQI5kQJ+AwGqBIcCOYcCgwEDAZsEuQJOuQJgAwGKBLUCKbUCewMB+wOmAlKmAmoDAeoDogItogJ/AwHbA/MBVvMBZwMBygPvATHvAYMBAwG7A+UBV+UBXAMBuQPhATHhAYYBAwGqA48DH48DfAMBmQPsAh/sAn8DAYoDgAMfgANwAwH7AoUDH4UDagMB7AKKAx+KA2sDAd0C+wIf+wJ0AwHOAvECH/ECcQMBvwL2Ah/2AoMBAwGwApQDH5QDZAMBoQKiAxu8AzQDAcQByAMfyANwAwG0Ac0DH80DawMBpQHDAx/DA4MBAwGWAaoDIaoDcgMBgQK0AyG0A20DAfIBrwMhrwN7AwHjAaUDIaUDhQEDAdQBuQMhuQN4AwHFAQ==</sads:DebugSymbol.Symbol>
   </Sequence>
   <sap2010:WorkflowViewState.ViewStateManager>
     <sap2010:ViewStateManager>
-      <sap2010:ViewStateData Id="QCountActivity_1" sap:VirtualizedContainerService.HintSize="464,22" />
-      <sap2010:ViewStateData Id="CreateSessionActivity_1" sap:VirtualizedContainerService.HintSize="534,22" />
-      <sap2010:ViewStateData Id="ReadQActivity_1" sap:VirtualizedContainerService.HintSize="534,22" />
-      <sap2010:ViewStateData Id="CheckPNRValidityActivity_1" sap:VirtualizedContainerService.HintSize="464,22" />
+      <sap2010:ViewStateData Id="QCountActivity_1" sap:VirtualizedContainerService.HintSize="1141,22" />
+      <sap2010:ViewStateData Id="CreateSessionActivity_1" sap:VirtualizedContainerService.HintSize="994,22" />
+      <sap2010:ViewStateData Id="ReadQActivity_1" sap:VirtualizedContainerService.HintSize="994,22" />
+      <sap2010:ViewStateData Id="CheckPNRValidityActivity_1" sap:VirtualizedContainerService.HintSize="924,22" />
       <sap2010:ViewStateData Id="Assign_1" sap:VirtualizedContainerService.HintSize="242,62">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -515,11 +538,27 @@
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="UpdateTicketingDetailInDB_1" sap:VirtualizedContainerService.HintSize="200,22">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="FlowStep_7">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <av:Point x:Key="ShapeLocation">650,509</av:Point>
+            <av:Size x:Key="ShapeSize">200,22</av:Size>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
       <sap2010:ViewStateData Id="FlowStep_2">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
             <av:Point x:Key="ShapeLocation">509,359</av:Point>
             <av:Size x:Key="ShapeSize">242,62</av:Size>
+            <av:PointCollection x:Key="ConnectorLocation">751,390 780,390 780,479 750,479 750,509</av:PointCollection>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
@@ -624,65 +663,88 @@
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
-      <sap2010:ViewStateData Id="Flowchart_1" sap:VirtualizedContainerService.HintSize="464,51">
+      <sap2010:ViewStateData Id="Flowchart_1" sap:VirtualizedContainerService.HintSize="924,811">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
-            <x:Boolean x:Key="IsExpanded">False</x:Boolean>
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
             <x:Boolean x:Key="IsPinned">False</x:Boolean>
             <av:Point x:Key="ShapeLocation">350,12.5</av:Point>
             <av:Size x:Key="ShapeSize">60,75</av:Size>
             <av:PointCollection x:Key="ConnectorLocation">380,87.5 380,117.5 81,117.5 81,146.5</av:PointCollection>
             <x:Double x:Key="Height">775</x:Double>
-            <x:Double x:Key="Width">751</x:Double>
+            <x:Double x:Key="Width">910</x:Double>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
       <sap2010:ViewStateData Id="IssueTicketActivity_1" sap:VirtualizedContainerService.HintSize="200,22" />
-      <sap2010:ViewStateData Id="If_2" sap:VirtualizedContainerService.HintSize="464,210" />
+      <sap2010:ViewStateData Id="If_2" sap:VirtualizedContainerService.HintSize="924,210">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
       <sap2010:ViewStateData Id="PNRMoveToQActivity_1" sap:VirtualizedContainerService.HintSize="200,22" />
-      <sap2010:ViewStateData Id="PNRMoveToQActivity_2" sap:VirtualizedContainerService.HintSize="200,22" />
-      <sap2010:ViewStateData Id="If_3" sap:VirtualizedContainerService.HintSize="464,210" />
-      <sap2010:ViewStateData Id="Sequence_4" sap:VirtualizedContainerService.HintSize="486,737">
+      <sap2010:ViewStateData Id="Sequence_7" sap:VirtualizedContainerService.HintSize="222,146">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
             <x:Boolean x:Key="IsExpanded">True</x:Boolean>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
-      <sap2010:ViewStateData Id="Sequence_5" sap:VirtualizedContainerService.HintSize="508,861">
+      <sap2010:ViewStateData Id="EndTransactNRetrieveActivity_1" sap:VirtualizedContainerService.HintSize="200,22" />
+      <sap2010:ViewStateData Id="If_3" sap:VirtualizedContainerService.HintSize="924,296">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Assign_7" sap:VirtualizedContainerService.HintSize="924,62" />
+      <sap2010:ViewStateData Id="Sequence_4" sap:VirtualizedContainerService.HintSize="946,1685">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            <x:Boolean x:Key="IsPinned">False</x:Boolean>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </sap2010:ViewStateData>
+      <sap2010:ViewStateData Id="Sequence_6" sap:VirtualizedContainerService.HintSize="968,1809">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
             <x:Boolean x:Key="IsExpanded">True</x:Boolean>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
-      <sap2010:ViewStateData Id="While_2" sap:VirtualizedContainerService.HintSize="534,1021" />
-      <sap2010:ViewStateData Id="CloseSessionActivity_1" sap:VirtualizedContainerService.HintSize="534,22" />
-      <sap2010:ViewStateData Id="Sequence_3" sap:VirtualizedContainerService.HintSize="556,1331">
+      <sap2010:ViewStateData Id="While_2" sap:VirtualizedContainerService.HintSize="994,1969" />
+      <sap2010:ViewStateData Id="CloseSessionActivity_1" sap:VirtualizedContainerService.HintSize="994,22" />
+      <sap2010:ViewStateData Id="Sequence_3" sap:VirtualizedContainerService.HintSize="1016,2279">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
             <x:Boolean x:Key="IsExpanded">True</x:Boolean>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
-      <sap2010:ViewStateData Id="If_1" sap:VirtualizedContainerService.HintSize="681,1481" />
-      <sap2010:ViewStateData Id="Delay_1" sap:VirtualizedContainerService.HintSize="464,22" />
-      <sap2010:ViewStateData Id="Sequence_2" sap:VirtualizedContainerService.HintSize="486,458">
+      <sap2010:ViewStateData Id="If_1" sap:VirtualizedContainerService.HintSize="1141,2429" />
+      <sap2010:ViewStateData Id="Delay_1" sap:VirtualizedContainerService.HintSize="1141,22" />
+      <sap2010:ViewStateData Id="Sequence_2" sap:VirtualizedContainerService.HintSize="1163,2677">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
             <x:Boolean x:Key="IsExpanded">True</x:Boolean>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
-      <sap2010:ViewStateData Id="While_1" sap:VirtualizedContainerService.HintSize="512,618" />
-      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="534,742">
+      <sap2010:ViewStateData Id="While_1" sap:VirtualizedContainerService.HintSize="1189,2837" />
+      <sap2010:ViewStateData Id="Sequence_1" sap:VirtualizedContainerService.HintSize="1211,2961">
         <sap:WorkflowViewStateService.ViewState>
           <scg:Dictionary x:TypeArguments="x:String, x:Object">
             <x:Boolean x:Key="IsExpanded">True</x:Boolean>
           </scg:Dictionary>
         </sap:WorkflowViewStateService.ViewState>
       </sap2010:ViewStateData>
-      <sap2010:ViewStateData Id="IGT.PNRProcessing.WorkflowLibrary.TicketingWorkflow_1" sap:VirtualizedContainerService.HintSize="574,822" />
+      <sap2010:ViewStateData Id="IGT.PNRProcessing.WorkflowLibrary.TicketingWorkflow_1" sap:VirtualizedContainerService.HintSize="1251,3041" />
     </sap2010:ViewStateManager>
   </sap2010:WorkflowViewState.ViewStateManager>
 </Activity>

@@ -22,6 +22,11 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
         private string _fareDetailRequest = "DisplayFareDetails.xml";
         private string _ticketIssuanceCash = "IssueTicketForCash.xml";
         private string _retrievePNRRequest = "RetrieveExistingPNR.xml";
+        private string _addRemarkWithNoMove = "AddGenRmkNoMove.xml";
+        private string _endTransact = "EndTransact.xml";
+        private string _ignoreAndDisplay = "IgnoreAndRedisplay.xml";
+        private string _endTransactNRetrieve = "EndTransactRetrieve";
+
         public enum RequestAction
         {
             I,
@@ -90,8 +95,7 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
 
             return strMCTError;
         }
-
-
+        
         public bool IsFOPTypeSupported(XmlElement _pPNRXml, string _pSupportedFOP)
         {
             if (!string.IsNullOrEmpty(_pSupportedFOP))
@@ -139,10 +143,11 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
             }
             return false;
         }
+
         public TypeOfFare GetFareType(GetHAPDetail _pHAP, string _pRecloc, string _pSession)
         {
-
-            XmlElement fareInfo = GetFareInfoInSession(_pHAP, _pRecloc, _pSession);
+            string strSession = string.Empty;
+            XmlElement fareInfo = GetFareInfo(_pHAP, _pRecloc, out strSession);
             TypeOfFare fareType = TypeOfFare.Unspecified;
 
             if (fareInfo != null)
@@ -188,10 +193,11 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
             return fareType;
         }
 
-        public void IssueTicket(GetHAPDetail _pHAP, string _pRecloc, string _pTraceId)
+        public XmlElement IssueTicket(GetHAPDetail _pHAP, string _pRecloc, string _pTraceId,  string _pSuccessRemark, string _pSession)
         {
             string strSession;
             int intNoOfFares = 0;
+            XmlElement xmlPNR = null;
             List<string> lstErrors;
             FareProcessing objFareProcessing = new FareProcessing();
             PNRProcessingAction objProcessTrace = new PNRProcessingAction();
@@ -217,10 +223,16 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
 
                     for (int i = 1; i <= intNoOfFares; i++)
                     {
-                        if (i != 1)
+                        if(i==1)
+                        {
+                            objFareProcessing.IssueTicketToFare(_pHAP, i.ToString(), strTransType, _pSession, out lstErrors);
+                        }
+                        else
+                        {
                             objFareProcessing.RetrievePNR(_pHAP, _pRecloc, strSession);
+                            objFareProcessing.IssueTicketToFare(_pHAP, i.ToString(), strTransType, strSession, out lstErrors);
+                        }
 
-                        objFareProcessing.IssueTicketToFare(_pHAP, i.ToString(), strTransType, strSession, out lstErrors);
 
                         if (lstErrors.Count > 0)
                         {
@@ -229,10 +241,15 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
                         }
 
                         if (i == intNoOfFares)
+                        {
                             objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.Completed, string.Empty, intNoOfFares, i, true);
+                            AddRemarkNoMove(_pHAP, _pSuccessRemark, strSession);
+                        }
                         else
                             objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.InProgress, string.Empty, intNoOfFares, i, false);
                     }
+
+                    xmlPNR = IgnoreAndReDisplay(_pHAP, _pSession);
                 }
             }
             catch (Exception ex)
@@ -240,6 +257,8 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
                 objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.Completed, ex.Message, true);
                 throw ex;
             }
+
+            return xmlPNR;
         }
 
         public XmlElement IssueTicketToFare(GetHAPDetail _pHAP, string _pFareNum, string _pTransType, string _pSession, out List<string> lstErrorMsg)
@@ -255,23 +274,131 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
 
             GWSConn objGwsConn = new GWSConn(_pHAP);
 
-            XmlElement request = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+            XmlElement resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+            lstErrorMsg = GetError(resp);
 
-            strErrorMsg = GetErrorsFromNodesWithErrorCode(request);
+            return resp;
+        }
+
+        public XmlElement AddRemarkNoMove(GetHAPDetail _pHAP, string _pRemark, string _pSession)
+        {
+            XmlElement resp = null;
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_addRemarkWithNoMove);
+
+            reqTemplate.SetNodeTextIfExist("//ItemAry/Item/GenRmkQual/AddQual/Rmk", _pRemark);
+
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+            XmlElement xmlResp = EndTransact(objGwsConn, _pSession);
+            List<string> lstError = GetError(xmlResp);
+
+            if (lstError != null && lstError.Count > 0)
+            {
+                ///Ignore retrieve and resend the cmd
+                IgnoreAndReDisplay(objGwsConn, _pSession);
+                resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+                xmlResp = EndTransact(objGwsConn, _pSession);
+            }
+
+            return resp;
+        }
+
+        public XmlElement IgnoreAndReDisplay(GWSConn _pGwsConn, string _pSession)
+        {
+            XmlElement resp = null;
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_ignoreAndDisplay);
+
+            resp = _pGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+            return resp;
+        }
+
+        public XmlElement IgnoreAndReDisplay(GetHAPDetail _pHAP, string _pSession)
+        {
+            XmlElement resp = null;
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_ignoreAndDisplay);
+
+            resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+            return resp;
+        }
+
+        public XmlElement EndTransact(GWSConn _pGwsConn, string _pSession)
+        {
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_endTransact);
+            XmlElement resp = _pGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+            List<string> lstError = GetError(resp);
+            if(lstError != null && lstError.Count > 0)
+            {
+                reqTemplate.RemoveChildIfExist("//RcvdFrom");
+                resp = _pGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+            }
+
+            return resp;
+        }
+
+        public XmlElement EndTransact(GetHAPDetail _pHAP, string _pSession)
+        {
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_endTransactNRetrieve);
+            XmlElement resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+            List<string> lstError = GetError(resp);
+            if (lstError != null && lstError.Count > 0)
+            {
+                reqTemplate.RemoveChildIfExist("//RcvdFrom");
+                resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+            }
+
+            return resp;
+        }
+
+        public XmlElement EndTransactNRetrieve(GetHAPDetail _pHAP, string _pSession)
+        {
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_endTransact);
+
+            GWSConn objGwsConn = new GWSConn(_pHAP);
+            XmlElement resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+            List<string> lstError = GetError(resp);
+            
+
+            if (lstError != null && lstError.Count > 0)
+            {
+                reqTemplate.RemoveChildIfExist("//RcvdFrom");
+                resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
+
+                IgnoreAndReDisplay(_pHAP, _pSession);
+            }
+
+            return resp;
+        }
+
+        public List<string> GetError(XmlElement responseDoc)
+        {
+            string strErrorMsg = string.Empty;
+            List<string> lstErrorMsg = new List<string>();
+            strErrorMsg = GetErrorsFromNodesWithErrorCode(responseDoc);
             if (!string.IsNullOrEmpty(strErrorMsg))
                 lstErrorMsg.Add(strErrorMsg);
 
             strErrorMsg = string.Empty;
-            strErrorMsg = GetErrorsFromNodesWithErrText(request);
+            strErrorMsg = GetErrorsFromNodesWithErrText(responseDoc);
             if (!string.IsNullOrEmpty(strErrorMsg))
                 lstErrorMsg.Add(strErrorMsg);
 
             strErrorMsg = string.Empty;
-            strErrorMsg = GetErrorsFromNodesWithErrorFault(request);
+            strErrorMsg = GetErrorsFromNodesWithErrorFault(responseDoc);
             if (!string.IsNullOrEmpty(strErrorMsg))
                 lstErrorMsg.Add(strErrorMsg);
 
-            return request;
+            return lstErrorMsg;
         }
 
         public string GetErrorsFromNodesWithErrorCode(XmlElement responseDoc)

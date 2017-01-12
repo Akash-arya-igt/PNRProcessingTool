@@ -49,11 +49,13 @@
     <Compile Include="CheckPNRValidityActivity.cs" />
     <Compile Include="CloseSessionActivity.cs" />
     <Compile Include="CreateSessionActivity.cs" />
+    <Compile Include="EndTransactNRetrieveActivity.cs" />
     <Compile Include="IssueTicketActivity.cs" />
     <Compile Include="PNRMoveToQActivity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QCountActivity.cs" />
     <Compile Include="ReadQActivity.cs" />
+    <Compile Include="UpdateTicketingDetailInDB.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IGT.PNRProcessingService.BusinessEngine\IGT.PNRProcessingService.BusinessEngine.csproj">

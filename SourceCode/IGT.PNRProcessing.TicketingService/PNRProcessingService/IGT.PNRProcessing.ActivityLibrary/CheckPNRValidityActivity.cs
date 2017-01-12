@@ -49,7 +49,7 @@ namespace IGT.PNRProcessing.ActivityLibrary
             bool isSupportedFOP = objFareProcessing.IsFOPTypeSupported(xmlPNR, strSupportedFOP);
             bool isValidFareType = objFareProcessing.GetFareType(objHAP, strRecloc, strSession).ToString().ToUpper() == strAllowedFareType.Trim().ToUpper();
             bool isValidPreFormatedRemark = string.IsNullOrEmpty(strPreFormatedRemark)
-                                            || lstGenRemarks.Any(x => Regex.IsMatch(x, ("^" + strPreFormatedRemark.Trim().Replace("#", "[A-Z0-9]{1}").Replace("*", "[A-Z0-9]*").Replace(" ", "") + "$"), RegexOptions.IgnoreCase));
+                                            || lstGenRemarks.Any(x => Regex.IsMatch(x, ("^" + strPreFormatedRemark.Trim().Replace("#", "[A-Z0-9]{1}").Replace("*", "[a-zA-Z0-9 !@#$%^&*)(:]*") + "$"), RegexOptions.IgnoreCase));
 
 
             string strTraceID = string.Empty;

@@ -35,7 +35,6 @@ namespace IGT.PNRProcessing.DataAccessLayer
                                          {
                                              FlowID = lst.TicketingflowId,
                                              FlowName = lst.TicketingflowName,
-                                             HAPDetail = objPCC,
                                              PreFormatedRemark = lst.PreFormatedRemark,
                                              CommissionPct = lst.CommissionPct != null ? lst.CommissionPct.Value : -1,
                                              CommissionRemarkFormat = lst.CommissionRemarkFormat,
@@ -50,6 +49,11 @@ namespace IGT.PNRProcessing.DataAccessLayer
                                              TargetQNo = lst.TargetQNo,
                                              ScanFrequency = lst.ScanFrequency
                                          }).ToList();
+
+                    foreach (var tktSetting in lstTktSetting)
+                    {
+                        tktSetting.HAPDetail = objPCC;
+                    }
 
                     if (lstTktSetting != null && lstTktSetting.Count > 0)
                         lstSettings.AddRange(lstTktSetting);

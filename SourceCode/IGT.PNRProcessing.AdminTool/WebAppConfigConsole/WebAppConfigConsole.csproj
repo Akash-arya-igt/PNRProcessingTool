@@ -177,6 +177,10 @@
     <Content Include="Views\PCCConfig\Details.cshtml" />
     <Content Include="Views\PCCConfig\Delete.cshtml" />
     <Content Include="Views\TicketingFlowConfig\Index.cshtml" />
+    <Content Include="Views\TicketingFlowConfig\Create.cshtml" />
+    <Content Include="Views\TicketingFlowConfig\Edit.cshtml" />
+    <Content Include="Views\TicketingFlowConfig\Details.cshtml" />
+    <Content Include="Views\TicketingFlowConfig\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

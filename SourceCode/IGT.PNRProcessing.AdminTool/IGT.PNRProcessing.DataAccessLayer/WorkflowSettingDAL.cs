@@ -15,17 +15,18 @@ namespace IGT.PNRProcessing.DataAccessLayer
             List<GetHAPDetail> lstHAPs = new List<GetHAPDetail>();
             using (PNRProcessingDBEntities dbctx = new PNRProcessingDBEntities())
             {
-                lstHAPs= (from lst in dbctx.tblPCCConfigurations
-                          select new GetHAPDetail
-                          {
-                              GDS = lst.GDS,
-                              PCCID = lst.PCCID,
-                              PCC = lst.PCC,
-                              Password = lst.Password,
-                              UserID = lst.UserId,
-                              Profile = lst.HAP,
-                              GWSConnURL = lst.URL
-                          }).ToList();
+                lstHAPs = (from lst in dbctx.tblPCCConfigurations
+                           select new GetHAPDetail
+                           {
+                               GDS = lst.GDS,
+                               PCCID = lst.PCCID,
+                               DisplayPCCName = lst.PCC + " - " + lst.HAP,
+                               PCC = lst.PCC,
+                               Password = lst.Password,
+                               UserID = lst.UserId,
+                               Profile = lst.HAP,
+                               GWSConnURL = lst.URL
+                           }).ToList();
             }
 
             return lstHAPs;
@@ -43,6 +44,7 @@ namespace IGT.PNRProcessing.DataAccessLayer
                                GDS = lst.GDS,
                                PCCID = lst.PCCID,
                                PCC = lst.PCC,
+                               DisplayPCCName = lst.PCC + " - " + lst.HAP,
                                Password = lst.Password,
                                UserID = lst.UserId,
                                Profile = lst.HAP,
@@ -52,6 +54,7 @@ namespace IGT.PNRProcessing.DataAccessLayer
 
             return objHAPs;
         }
+
 
         public void SaveHAPDetail(GetHAPDetail _pHAPDetail)
         {
@@ -123,6 +126,10 @@ namespace IGT.PNRProcessing.DataAccessLayer
                                              CommissionRemarkFormat = lst.CommissionRemarkFormat,
                                              AllowedFareType = lst.AllowedFareType,
                                              AllowedFOPId = lst.AllowedFOP,
+                                             IsCashFOP = lst.AllowedFOP.Contains(((int)FOPType.Cash).ToString()),
+                                             IsCCFOP = lst.AllowedFOP.Contains(((int)FOPType.CreditCard).ToString()),
+                                             IsPublished = lst.AllowedFOP.Contains(FareType.PUBLISHED.ToString()),
+                                             IsPrivate = lst.AllowedFOP.Contains(FareType.PUBLISHED.ToString()),
                                              IsCheckAVL = lst.IsAVLCheck,
                                              IsCheckMCT = lst.IsMCTCheck,
                                              SuccessQ = lst.SuccessQNo,
@@ -130,8 +137,13 @@ namespace IGT.PNRProcessing.DataAccessLayer
                                              FailQ = lst.FailQNo,
                                              FailMsg = lst.FailMsg,
                                              TargetQNo = lst.TargetQNo,
-                                             ScanFrequency = lst.ScanFrequency
+                                             ScanFrequency = lst.ScanFrequency                                             
                                          }).ToList();
+
+                    foreach (var obj in lstTktSetting)
+                    {
+                        obj.PCCName = objPCC.PCC + " - " + objPCC.Profile;
+                    }
 
                     if (lstTktSetting != null && lstTktSetting.Count > 0)
                         lstSettings.AddRange(lstTktSetting);
@@ -140,5 +152,130 @@ namespace IGT.PNRProcessing.DataAccessLayer
 
             return lstSettings;
         }
+
+        public GetTicketingFlowSettings GetTFSDetail(int _pFlowID)
+        {
+            GetTicketingFlowSettings objTFSs = new GetTicketingFlowSettings();
+            using (PNRProcessingDBEntities dbctx = new PNRProcessingDBEntities())
+            {
+                objTFSs = (from lst in dbctx.tblTicketingFlowConfigurations
+                           where lst.TicketingflowId == _pFlowID
+                           select new GetTicketingFlowSettings
+                           {
+                               PCCID = lst.PCCID,
+                               FlowID = lst.TicketingflowId,
+                               FlowName = lst.TicketingflowName,
+                               PreFormatedRemark = lst.PreFormatedRemark,
+                               CommissionPct = lst.CommissionPct != null ? lst.CommissionPct.Value:-1,
+                               CommissionRemarkFormat = lst.CommissionRemarkFormat,
+                               AllowedFOPId = lst.AllowedFOP,
+                               AllowedFareType = lst.AllowedFareType,
+                               IsCashFOP = lst.AllowedFOP.Contains(((int)FOPType.Cash).ToString()),
+                               IsCCFOP = lst.AllowedFOP.Contains(((int)FOPType.CreditCard).ToString()),
+                               IsPublished = lst.AllowedFOP.Contains(FareType.PUBLISHED.ToString()),
+                               IsPrivate = lst.AllowedFOP.Contains(FareType.PUBLISHED.ToString()),
+                               IsCheckAVL = lst.IsAVLCheck,
+                               IsCheckMCT = lst.IsMCTCheck,
+                               SuccessQ = lst.SuccessQNo,
+                               SuccessMsg = lst.SuccessMsg,
+                               FailQ = lst.FailQNo,
+                               FailMsg = lst.FailMsg,
+                               TargetQNo = lst.TargetQNo,
+                               ScanFrequency = lst.ScanFrequency
+                           }).FirstOrDefault();
+
+                var objPCC = (from lst in dbctx.tblPCCConfigurations
+                              where lst.PCCID == objTFSs.PCCID
+                              select lst).FirstOrDefault();
+
+                objTFSs.PCCName = objPCC.PCC + " - " + objPCC.HAP;
+            }
+
+            return objTFSs;
+        }
+
+        public void SaveTFSDetail(GetTicketingFlowSettings _pTFSDetail)
+        {
+            string strAllowedFOP = (_pTFSDetail.IsCashFOP ? (int)FOPType.Cash + "," : string.Empty) +
+                                   (_pTFSDetail.IsCCFOP ? ((int)FOPType.CreditCard).ToString() : string.Empty);
+
+            string strFareType = (_pTFSDetail.IsPublished ? FareType.PUBLISHED.ToString() + "," : string.Empty) +
+                                 (_pTFSDetail.IsPrivate ? FareType.PRIVATE.ToString() : string.Empty);
+
+            using (PNRProcessingDBEntities dbctx = new PNRProcessingDBEntities())
+            {
+                tblTicketingFlowConfiguration objFlowConfig = new tblTicketingFlowConfiguration()
+                {
+                    PCCID = _pTFSDetail.PCCID,
+                    PreFormatedRemark = _pTFSDetail.PreFormatedRemark,
+                    CommissionRemarkFormat = _pTFSDetail.CommissionRemarkFormat,
+                    AllowedFareType = strFareType,
+                    AllowedFOP = strAllowedFOP,
+                    CommissionPct = _pTFSDetail.CommissionPct,
+                    FailQNo = _pTFSDetail.FailQ,
+                    IsAVLCheck = _pTFSDetail.IsCheckAVL,
+                    IsMCTCheck = _pTFSDetail.IsCheckMCT,
+                    SuccessQNo = _pTFSDetail.SuccessQ,
+                    TicketingflowName = _pTFSDetail.FlowName,
+                    SuccessMsg = _pTFSDetail.SuccessMsg,
+                    FailMsg = _pTFSDetail.FailMsg,
+                    TargetQNo = _pTFSDetail.TargetQNo,
+                    ScanFrequency = _pTFSDetail.ScanFrequency
+
+                };
+
+                dbctx.tblTicketingFlowConfigurations.Add(objFlowConfig);
+                dbctx.SaveChanges();
+            }
+        }
+
+        public void UpdateTFSDetail(GetTicketingFlowSettings _pTFSDetail)
+        {
+            string strAllowedFOP = (_pTFSDetail.IsCashFOP ? (int)FOPType.Cash + "," : string.Empty) +
+                                   (_pTFSDetail.IsCCFOP ? ((int)FOPType.CreditCard).ToString() : string.Empty);
+
+            string strFareType = (_pTFSDetail.IsPublished ? FareType.PUBLISHED.ToString() + "," : string.Empty) +
+                                 (_pTFSDetail.IsPrivate ? FareType.PRIVATE.ToString() : string.Empty);
+
+            using (PNRProcessingDBEntities dbctx = new PNRProcessingDBEntities())
+            {
+                tblTicketingFlowConfiguration objTFC = new tblTicketingFlowConfiguration()
+                {
+                    TicketingflowId = _pTFSDetail.FlowID,
+                    PreFormatedRemark = _pTFSDetail.PreFormatedRemark,
+                    CommissionRemarkFormat = _pTFSDetail.CommissionRemarkFormat,
+                    AllowedFareType = strFareType,
+                    AllowedFOP = strAllowedFOP,
+                    CommissionPct = _pTFSDetail.CommissionPct,
+                    FailQNo = _pTFSDetail.FailQ,
+                    IsAVLCheck = _pTFSDetail.IsCheckAVL,
+                    IsMCTCheck = _pTFSDetail.IsCheckMCT,
+                    SuccessQNo = _pTFSDetail.SuccessQ,
+                    TicketingflowName = _pTFSDetail.FlowName,
+                    SuccessMsg = _pTFSDetail.SuccessMsg,
+                    FailMsg = _pTFSDetail.FailMsg,
+                    TargetQNo = _pTFSDetail.TargetQNo,
+                    ScanFrequency = _pTFSDetail.ScanFrequency
+                };
+
+                dbctx.Entry(objTFC).State = EntityState.Modified;
+                dbctx.SaveChanges();
+            }
+        }
+
+        public void DeleteTFSDetail(GetTicketingFlowSettings _pTFSDetail)
+        {
+            using (PNRProcessingDBEntities dbctx = new PNRProcessingDBEntities())
+            {
+                tblTicketingFlowConfiguration objTFS = new tblTicketingFlowConfiguration()
+                {
+                };
+
+                dbctx.Entry(objTFS).State = EntityState.Deleted;
+                dbctx.SaveChanges();
+            }
+        }
     }
+
+
 }
