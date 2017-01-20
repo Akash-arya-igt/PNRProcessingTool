@@ -1,65 +1,65 @@
 ﻿@model IEnumerable<IGT.PNRProcessing.BusinessEntities.GetTicketingFlowSettings>
 
     @{
-        ViewBag.Title = "Index";
+        ViewBag.Title = "Ticketing Flow Configuration";
         Layout = "~/Views/Shared/_Layout.cshtml";
     }
 
-    <h2>Index</h2>
+    <h3>Ticketing Flow Configuration <span class="btn_create"> @Html.ActionLink("Create New", "Create") </span></h3>
 
     <p>
-        @Html.ActionLink("Create New", "Create")
+       
     </p>
-    <table class="table">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PCCName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FlowName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SuccessQ)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FailQ)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TargetQNo)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ScanFrequency)
-            </th>
-            <th></th>
-        </tr>
+                      <table class="table table-striped table-hover table-bordered mr_top_20">
+                          <tr>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.PCCName)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.FlowName)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.SuccessQ)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.FailQ)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.TargetQNo)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.ScanFrequency)
+                              </th>
+                              <th></th>
+                          </tr>
 
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PCCName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FlowName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SuccessQ)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.FailQ)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TargetQNo)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ScanFrequency)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.FlowID }) |
-                    @Html.ActionLink("Details", "Details", new { id=item.FlowID }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.FlowID })
-                </td>
-            </tr>
-        }
+                          @foreach (var item in Model)
+                          {
+                              <tr>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.PCCName)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.FlowName)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.SuccessQ)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.FailQ)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.TargetQNo)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.ScanFrequency)
+                                  </td>
+                                  <td>
+                                      @Html.ActionLink("Edit", "Edit", new { id = item.FlowID }) |
+                                      @Html.ActionLink("Details", "Details", new { id = item.FlowID }) |
+                                      @Html.ActionLink("Delete", "Delete", new { id = item.FlowID })
+                                  </td>
+                              </tr>
+                          }
 
-    </table>
+                      </table>

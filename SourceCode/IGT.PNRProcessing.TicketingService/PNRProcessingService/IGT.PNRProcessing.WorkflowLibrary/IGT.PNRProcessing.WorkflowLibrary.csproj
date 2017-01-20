@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{C75B0CC7-CA72-4825-AC16-7B891E033DAD}</ProjectGuid>
     <ProjectTypeGuids>{32f31d43-81cc-4c15-9de6-3fc5453562b6};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IGT.PNRProcessing.WorkflowLibrary</RootNamespace>
     <AssemblyName>IGT.PNRProcessing.WorkflowLibrary</AssemblyName>
@@ -31,8 +31,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.1\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
     <Reference Include="System.Core" />
@@ -45,6 +52,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -58,10 +66,18 @@
       <Project>{e54ea76e-c426-4372-b254-9b5dbed67ef2}</Project>
       <Name>IGT.PNRProcessing.ActivityLibrary</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IGT.PNRProcessingService.BusinessEngine\IGT.PNRProcessingService.BusinessEngine.csproj">
+      <Project>{3a435a89-730b-45cd-939d-4ea8b64ba4c6}</Project>
+      <Name>IGT.PNRProcessingService.BusinessEngine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IGT.PNRProcessingService.BusinessEntities\IGT.PNRProcessingService.BusinessEntities.csproj">
       <Project>{a3684671-a814-47e5-b2c8-9af331d2ebed}</Project>
       <Name>IGT.PNRProcessingService.BusinessEntities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

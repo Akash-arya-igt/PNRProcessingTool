@@ -47,7 +47,17 @@ namespace IGT.PNRProcessing.ActivityLibrary
             string strMCTError = objFareProcessing.CheckMCTError(strSession, objHAP);
             bool isMCTError = !string.IsNullOrEmpty(strMCTError);
             bool isSupportedFOP = objFareProcessing.IsFOPTypeSupported(xmlPNR, strSupportedFOP);
-            bool isValidFareType = objFareProcessing.GetFareType(objHAP, strRecloc, strSession).ToString().ToUpper() == strAllowedFareType.Trim().ToUpper();
+            bool isValidFareType = false;
+            if (!string.IsNullOrEmpty(strAllowedFareType))
+            {
+                string strFareType = objFareProcessing.GetFareType(objHAP, strRecloc, strSession).ToString();
+                isValidFareType = !string.IsNullOrEmpty(strFareType) ? strAllowedFareType.ToUpper().Contains(strFareType.ToUpper()) : true;
+            }
+            else
+                isValidFareType = true;
+
+
+
             bool isValidPreFormatedRemark = string.IsNullOrEmpty(strPreFormatedRemark)
                                             || lstGenRemarks.Any(x => Regex.IsMatch(x, ("^" + strPreFormatedRemark.Trim().Replace("#", "[A-Z0-9]{1}").Replace("*", "[a-zA-Z0-9 !@#$%^&*)(:]*") + "$"), RegexOptions.IgnoreCase));
 

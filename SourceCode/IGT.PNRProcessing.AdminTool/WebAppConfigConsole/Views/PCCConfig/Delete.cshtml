@@ -1,16 +1,14 @@
 ﻿@model IGT.PNRProcessing.BusinessEntities.GetHAPDetail
 
 @{
-    ViewBag.Title = "Delete";
+    ViewBag.Title = "PCC Configuration: Delete";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Delete</h2>
-
-<h3>Are you sure you want to delete this?</h3>
+<h3>PCC Configuration: Delete</h3>
+<hr />
+<h5>Are you sure you want to delete below PCC Configuration?</h5>
 <div>
-    <h4>GetHAPDetail</h4>
-    <hr />
     <dl class="dl-horizontal">
 
         <dt>
@@ -67,8 +65,10 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index")
+            <input type="submit" value="Delete" class="btn btn-default btn-primary" />
+          
         </div>
     }
+
 </div>
+<div class="pad_btm_10">@Html.ActionLink("Back to List", "Index")</div>

@@ -1,0 +1,76 @@
+﻿@model IEnumerable<IGT.PNRProcessing.BusinessEntities.GetPNRProcessingTrace>
+
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<p>
+   
+</p>
+                      <table class="table table-striped table-hover table-bordered mr_top_20">
+                          <tr>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.Recloc)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.PCC)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.Status)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.IsProcessComplete)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.Error)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.PNRCaptureDate)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.LastModified)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.NoOfFares)
+                              </th>
+                              <th>
+                                  @Html.DisplayNameFor(model => model.NoOfTicketedFares)
+                              </th>
+                          </tr>
+
+                          @foreach (var item in Model)
+                          {
+                              <tr>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.Recloc)
+                                      @Html.HiddenFor(modelItem => item.PNRProcessingTraceId)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.PCC)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.Status)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.IsProcessComplete)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.Error)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.PNRCaptureDate)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.LastModified)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.NoOfFares)
+                                  </td>
+                                  <td>
+                                      @Html.DisplayFor(modelItem => item.NoOfTicketedFares)
+                                  </td>
+                              </tr>
+                          }
+
+                      </table>

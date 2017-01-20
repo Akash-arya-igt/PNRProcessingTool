@@ -193,12 +193,12 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
             return fareType;
         }
 
-        public XmlElement IssueTicket(GetHAPDetail _pHAP, string _pRecloc, string _pTraceId,  string _pSuccessRemark, string _pSession)
+        public void IssueTicket(GetHAPDetail _pHAP, string _pRecloc, string _pTraceId,  string _pSuccessRemark, out string _oSession)
         {
             string strSession;
             int intNoOfFares = 0;
-            XmlElement xmlPNR = null;
             List<string> lstErrors;
+            _oSession = string.Empty;
             FareProcessing objFareProcessing = new FareProcessing();
             PNRProcessingAction objProcessTrace = new PNRProcessingAction();
 
@@ -207,6 +207,7 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
                 if (objProcessTrace.GetProcessingStatus(_pTraceId) == BusinessEntities.PNRProcessingStatus.Recorded.ToString())
                 {
                     XmlElement response = objFareProcessing.GetFareInfo(_pHAP, _pRecloc, out strSession);
+                    _oSession = strSession;
 
                     if (response != null)
                         intNoOfFares = response.SelectNodes("//GenQuoteDetails").Count;
@@ -223,15 +224,12 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
 
                     for (int i = 1; i <= intNoOfFares; i++)
                     {
-                        if(i==1)
-                        {
-                            objFareProcessing.IssueTicketToFare(_pHAP, i.ToString(), strTransType, _pSession, out lstErrors);
-                        }
-                        else
+                        if(i!=1)
                         {
                             objFareProcessing.RetrievePNR(_pHAP, _pRecloc, strSession);
-                            objFareProcessing.IssueTicketToFare(_pHAP, i.ToString(), strTransType, strSession, out lstErrors);
                         }
+
+                        objFareProcessing.IssueTicketToFare(_pHAP, i.ToString(), strTransType, strSession, out lstErrors);
 
 
                         if (lstErrors.Count > 0)
@@ -248,8 +246,6 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
                         else
                             objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.InProgress, string.Empty, intNoOfFares, i, false);
                     }
-
-                    xmlPNR = IgnoreAndReDisplay(_pHAP, _pSession);
                 }
             }
             catch (Exception ex)
@@ -257,8 +253,6 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
                 objProcessTrace.UpdateProcessingStatus(_pTraceId, PNRProcessingStatus.Completed, ex.Message, true);
                 throw ex;
             }
-
-            return xmlPNR;
         }
 
         public XmlElement IssueTicketToFare(GetHAPDetail _pHAP, string _pFareNum, string _pTransType, string _pSession, out List<string> lstErrorMsg)
@@ -291,8 +285,8 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
             GWSConn objGwsConn = new GWSConn(_pHAP);
             resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
 
-            XmlElement xmlResp = EndTransact(objGwsConn, _pSession);
-            List<string> lstError = GetError(xmlResp);
+            //XmlElement xmlResp = EndTransact(objGwsConn, _pSession);
+            List<string> lstError = GetError(resp);
 
             if (lstError != null && lstError.Count > 0)
             {
@@ -300,7 +294,7 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
                 IgnoreAndReDisplay(objGwsConn, _pSession);
                 resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
 
-                xmlResp = EndTransact(objGwsConn, _pSession);
+                //xmlResp = EndTransact(objGwsConn, _pSession);
             }
 
             return resp;
@@ -343,10 +337,10 @@ namespace IGT.PNRProcessingService.BusinessEngine.GALEngine
             return resp;
         }
 
-        public XmlElement EndTransact(GetHAPDetail _pHAP, string _pSession)
+        public XmlElement EndTransactRetrieveNextPNR(GetHAPDetail _pHAP, string _pSession)
         {
             GWSConn objGwsConn = new GWSConn(_pHAP);
-            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_endTransactNRetrieve);
+            XmlDocument reqTemplate = XMLUtil.ReadTemplate(_endTransact);
             XmlElement resp = objGwsConn.SubmitXmlOnSession(_pSession, reqTemplate.DocumentElement);
 
             List<string> lstError = GetError(resp);

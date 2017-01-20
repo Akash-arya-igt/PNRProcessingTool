@@ -11,7 +11,7 @@ namespace IGT.PNRProcessingService.BusinessEngine.CommonUtil
 
         public static XmlDocument ReadTemplate(string _pTemplateName)
         {
-            var xmlStr = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, _rootPath, _pTemplateName));
+            var xmlStr = File.ReadAllText(Path.Combine(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location), _rootPath, _pTemplateName));
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(xmlStr);

@@ -1,0 +1,51 @@
+﻿@model WebAppConfigConsole.Models.Login
+
+@{
+    ViewBag.Title = "Login";
+    Layout = null;
+}
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/Login.css" rel="stylesheet" />
+<!-- Latest compiled and minified CSS -->
+<!-- Latest compiled and minified JavaScript -->
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal auto-style1 table_cls">
+        @Html.ValidationSummary(true)
+
+        <div class="">
+            <div class="logo_div">
+                <img src="../Content/images/iqd-logo.png" width="200" />
+            </div>
+        </div>
+
+        <div class="form-group auto-style2 ">
+            @Html.LabelFor(model => model.Name, new { @class = "control-label col-md-4" })
+            <div class="col-md-8 txt text_fild">
+                @Html.EditorFor(model => model.Name)
+                @Html.ValidationMessageFor(model => model.Name)
+            </div>
+        </div>
+
+        <div class="form-group auto-style2 ">
+            @Html.LabelFor(model => model.Password, new { @class = "control-label col-md-4" })
+            <div class="col-md-8 txt text_fild">
+                @Html.PasswordFor(model => model.Password)
+                @Html.ValidationMessageFor(model => model.Password)
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-4 col-md-8">
+                <input type="submit" value="Login" class="btn btn-default btn-primary" />
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/Content/css")
+}

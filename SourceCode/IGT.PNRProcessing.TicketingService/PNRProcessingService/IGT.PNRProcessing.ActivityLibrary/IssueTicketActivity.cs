@@ -17,33 +17,33 @@ namespace IGT.PNRProcessing.ActivityLibrary
         public InArgument<string> TraceID { get; set; }
         public InArgument<float> CommissionPct { get; set; }
         public InArgument<string> SuccessRemark { get; set; }
-        public InArgument<string> Session { get; set; }
 
         public OutArgument<string> Error { get; set; }
         public OutArgument<bool> IsErrorOccured { get; set; }
-        public OutArgument<XmlElement> PNRXml { get; set; }
+        public OutArgument<string> TicketingSession { get; set; }
         protected override void Execute(CodeActivityContext context)
         {
-            GetHAPDetail objHAP = context.GetValue(this.HAPSetting);
+            string strTicketingSession = string.Empty;
             string strRecloc = context.GetValue(this.Recloc);
             string strTraceID = context.GetValue(this.TraceID);
+            GetHAPDetail objHAP = context.GetValue(this.HAPSetting);
             string strSuccessRemark = context.GetValue(this.SuccessRemark);
-            string strSession = context.GetValue(this.Session);
 
             try
             {
                 FareProcessing objFareProcessing = new FareProcessing();
-                XmlElement xmlNextPNR = objFareProcessing.IssueTicket(objHAP, strRecloc, strTraceID, strSuccessRemark, strSession);
+                objFareProcessing.IssueTicket(objHAP, strRecloc, strTraceID, strSuccessRemark, out strTicketingSession);
 
                 context.SetValue(Error, string.Empty);
                 context.SetValue(IsErrorOccured, false);
-                //context.SetValue(PNRXml, xmlNextPNR);
             }
             catch (Exception ex)
             {
                 context.SetValue(Error, ex.Message);
                 context.SetValue(IsErrorOccured, true);
             }
+
+            context.SetValue(TicketingSession, strTicketingSession);
         }
     }
 }

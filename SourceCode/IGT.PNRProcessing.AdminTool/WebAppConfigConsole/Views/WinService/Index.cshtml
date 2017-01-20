@@ -1,0 +1,38 @@
+﻿@model WebAppConfigConsole.Models.ServiceStatus
+
+<div id="dvServiceStatus">
+    <h6>Service Status:&nbsp;@Html.DisplayFor(model => model.ServiceCurrentStatus)</h6>
+
+    
+    @if (Model.IsStartVisible)
+    {
+        @Ajax.ActionLink("Start", "ChangeStatus", "WinService",
+                 new { ChangeServiceStatus = "START" },
+                                   new AjaxOptions
+                                   {
+                                       UpdateTargetId = "dvServiceStatus",
+                                       InsertionMode = InsertionMode.Replace,
+                                       HttpMethod = "GET"
+                                   }, new { style = "background-image:url(../../Content/images/play.png);color:#f1f1f1;" })
+    }
+    @if (Model.IsRestartVisible)
+    {
+        @Ajax.ActionLink("Restart", "ChangeStatus", "WinService", new { ChangeServiceStatus = "RESTART" },
+                                   new AjaxOptions
+                                   {
+                                       UpdateTargetId = "dvServiceStatus",
+                                       InsertionMode = InsertionMode.Replace,
+                                       HttpMethod = "GET"
+                                   }, new { style = "background-image:url(../../Content/images/restart.png);color:#f1f1f1;" })
+    }
+    @if (Model.IsStopVisible)
+    {
+        @Ajax.ActionLink("Stop", "ChangeStatus", "WinService", new { ChangeServiceStatus = "STOP" },
+                                           new AjaxOptions
+                                           {
+                                               UpdateTargetId = "dvServiceStatus",
+                                               InsertionMode = InsertionMode.Replace,
+                                               HttpMethod = "GET"
+                                           }, new { style = "background-image:url(../../Content/images/stop.png);color:#f1f1f1;" })
+    }
+</div>

@@ -6,37 +6,54 @@
     <title>@ViewBag.Title - My ASP.NET Application</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
-</head>
-<body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("PCC Configuration", "Index", "PCCConfig")</li>
-                    <li>@Html.ActionLink("Flow Configuration", "Index", "TicketingFlowConfig")</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-    </div>
+    <link href="~/Content/Login.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+</head>
+<body class="Bg">
+
+
+    <div class="navbar navbar-fixed-top new_nav">
+        <div class="col-lg-2 col-md-2">
+            <div class="nav_logo"> <img src="../../Content/images/iqd-logo.png" width="150" /></div>
+        </div>
+        <div class="col-lg-10 col-md-10 pad_top_10px">
+            
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                </div>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li>@Html.ActionLink("PCC Configuration", "Index", "PCCConfig")</li>
+                        <li>@Html.ActionLink("Flow Configuration", "Index", "TicketingFlowConfig")</li>
+                        <li>@Html.ActionLink("Dashboard", "Index", "Dashboard")</li>
+                        <li>@Html.ActionLink("Logout", "Logout", "Dashboard")</li>
+                    </ul>
+                    <ul style="float:right;"  class="nav navbar-nav">
+                        <li>@Html.ActionLink("Robotics", "Index", "Dashboard")</li>
+                    </ul>
+                </div>
+
+            @*<a href="" class="refresh">	</a>
+            <a href="" class="start">	</a>
+            <a href="" class="stop">	</a>
+            <a href="" class="restart">	</a>*@
+                @{Html.RenderAction("Index", "WinService");}
+
+           
+        </div>
+    </div>
+
+    <div class="container body-content ">
+        @RenderBody()
+    </div>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

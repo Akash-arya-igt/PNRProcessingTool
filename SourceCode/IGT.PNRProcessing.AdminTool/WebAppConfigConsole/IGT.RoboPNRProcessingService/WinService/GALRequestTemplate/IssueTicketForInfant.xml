@@ -1,0 +1,30 @@
+﻿<DocProdFareManipulation_16>
+  <TicketingMods>
+    <FareNumInfo>
+      <FareNumAry>
+        <FareNum></FareNum>
+      </FareNumAry>
+    </FareNumInfo>
+    <TicketingControl>
+      <TransType></TransType>
+    </TicketingControl>
+    <ElectronicTicketFailed>
+      <CancelInd>Y</CancelInd>
+      <IssuePaperTkInd/>
+      <IssuePaperTkToSTP/>
+      <STPlocation/>
+    </ElectronicTicketFailed>
+    <OtherFOP>
+      <FOPID>1</FOPID>
+      <Type>2</Type>
+      <PmtCrncy>AUD</PmtCrncy>
+      <Amt/>
+      <AddlDataIDAry>
+        <AddlDataID>
+          <ID/>
+          <Dt/>
+        </AddlDataID>
+      </AddlDataIDAry>
+    </OtherFOP>
+  </TicketingMods>
+</DocProdFareManipulation_16>

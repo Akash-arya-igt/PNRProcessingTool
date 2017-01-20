@@ -1,0 +1,8 @@
+<PNRBFManagement_33>
+	<EndTransactionMods>
+		<EndTransactRequest>
+			<ETInd>E</ETInd>
+			<RcvdFrom>ROBOTICS</RcvdFrom>
+		</EndTransactRequest>
+	</EndTransactionMods>
+</PNRBFManagement_33>

@@ -1,20 +1,18 @@
 ﻿@model IGT.PNRProcessing.BusinessEntities.GetTicketingFlowSettings
 
 @{
-    ViewBag.Title = "Edit";
+    ViewBag.Title = "Ticketing Flow Configuration: Edit";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Edit</h2>
+<h3>Ticketing Flow Configuration: Edit</h3>
 
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
+    <hr />
     <div class="form-horizontal">
-        <h4>GetTicketingFlowSettings</h4>
-        <hr />
         @Html.ValidationSummary(true)
         <div class="form-group">
             @Html.LabelFor(model => model.PCCName, new { @class = "control-label col-md-2" })
@@ -139,7 +137,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Save" class="btn btn-default btn-primary" />
             </div>
         </div>
     </div>
