@@ -111,10 +111,10 @@ border-color: #2E6DA4;
 .pad_btm_10 { padding-bottom:20px;
 }
 
- .refresh{ width:30px; height:30px; float:left; display:block; background: url("../Content/images/refresh.png") center no-repeat; margin-right:10px; border-radius:4px;}
-  .start{ width:30px; height:30px; float:left; display:block; background: url("../Content/images/play.png") center no-repeat; margin-right:10px; border-radius:4px;}
-  .stop{ width:30px; height:30px; float:left; display:block; background: url("../Content/images/refresh.png") center no-repeat; margin-right:10px; border-radius:4px;}
-    .restart{ width:30px; height:30px; float:left; display:block; background: url("../Content/images/restart.png") center no-repeat; margin-right:10px; border-radius:4px;}
+ .refresh{ width:30px; height:30px; float:left; display:block; background: url("~/Content/images/refresh.png") center no-repeat; margin-right:10px; border-radius:4px;}
+  .start{ width:30px; height:30px; float:left; display:block; background: url("~/Content/images/play.png") center no-repeat; margin-right:10px; border-radius:4px;}
+  .stop{ width:30px; height:30px; float:left; display:block; background: url("~/Content/images/refresh.png") center no-repeat; margin-right:10px; border-radius:4px;}
+    .restart{ width:30px; height:30px; float:left; display:block; background: url("~/Content/images/restart.png") center no-repeat; margin-right:10px; border-radius:4px;}
 .refresh:hover,.start:hover,.stop:hover,.restart:hover{ background-color:#e1e1e1;}
 #dvServiceStatus { float: right;
     text-align: center;

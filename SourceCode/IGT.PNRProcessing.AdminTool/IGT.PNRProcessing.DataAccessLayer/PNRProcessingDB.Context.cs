@@ -25,10 +25,8 @@ namespace IGT.PNRProcessing.DataAccessLayer
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Queue> Queues { get; set; }
-        public virtual DbSet<Robot> Robots { get; set; }
-        public virtual DbSet<tblPNRProcessingTrace> tblPNRProcessingTraces { get; set; }
         public virtual DbSet<tblPCCConfiguration> tblPCCConfigurations { get; set; }
+        public virtual DbSet<tblPNRProcessingTrace> tblPNRProcessingTraces { get; set; }
         public virtual DbSet<tblTicketingFlowConfiguration> tblTicketingFlowConfigurations { get; set; }
     }
 }

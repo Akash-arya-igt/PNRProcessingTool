@@ -68,12 +68,6 @@
       <DependentUpon>PNRProcessingDB.edmx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queue.cs">
-      <DependentUpon>PNRProcessingDB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Robot.cs">
-      <DependentUpon>PNRProcessingDB.tt</DependentUpon>
-    </Compile>
     <Compile Include="tblPCCConfiguration.cs">
       <DependentUpon>PNRProcessingDB.tt</DependentUpon>
     </Compile>
