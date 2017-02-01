@@ -55,7 +55,6 @@ namespace IGT.PNRProcessing.DataAccessLayer
             return objHAPs;
         }
 
-
         public void SaveHAPDetail(GetHAPDetail _pHAPDetail)
         {
             using (PNRProcessingDBEntities dbctx = new PNRProcessingDBEntities())

@@ -13,7 +13,7 @@
                                        UpdateTargetId = "dvServiceStatus",
                                        InsertionMode = InsertionMode.Replace,
                                        HttpMethod = "GET"
-                                   }, new { style = "background-image:url(../../Content/images/play.png);color:#f1f1f1;" })
+                                   }, new { style = "background-image:url(~/Content/images/play.png);color:#f1f1f1;" })
     }
     @if (Model.IsRestartVisible)
     {
@@ -23,7 +23,7 @@
                                        UpdateTargetId = "dvServiceStatus",
                                        InsertionMode = InsertionMode.Replace,
                                        HttpMethod = "GET"
-                                   }, new { style = "background-image:url(../../Content/images/restart.png);color:#f1f1f1;" })
+                                   }, new { style = "background-image:url(~/Content/images/restart.png);color:#f1f1f1;" })
     }
     @if (Model.IsStopVisible)
     {
@@ -33,6 +33,6 @@
                                                UpdateTargetId = "dvServiceStatus",
                                                InsertionMode = InsertionMode.Replace,
                                                HttpMethod = "GET"
-                                           }, new { style = "background-image:url(../../Content/images/stop.png);color:#f1f1f1;" })
+                                           }, new { style = "background-image:url(~/Content/images/stop.png);color:#f1f1f1;" })
     }
 </div>
