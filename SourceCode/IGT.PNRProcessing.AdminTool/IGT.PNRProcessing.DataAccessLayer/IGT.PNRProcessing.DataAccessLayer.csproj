@@ -80,17 +80,24 @@
     <Compile Include="WorkflowSettingDAL.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="App.Config" />
+    <None Include="packages.config" />
     <EntityDeploy Include="PNRProcessingDB.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>PNRProcessingDB.Designer.cs</LastGenOutput>
     </EntityDeploy>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.Config" />
-    <None Include="packages.config" />
     <None Include="PNRProcessingDB.edmx.diagram">
       <DependentUpon>PNRProcessingDB.edmx</DependentUpon>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IGT.PNRProcessing.BusinessEntities\IGT.PNRProcessing.BusinessEntities.csproj">
+      <Project>{358eca1b-6abf-4cde-9890-0a1222dd3cab}</Project>
+      <Name>IGT.PNRProcessing.BusinessEntities</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="PNRProcessingDB.Context.tt">
@@ -103,15 +110,6 @@
       <DependentUpon>PNRProcessingDB.edmx</DependentUpon>
       <LastGenOutput>PNRProcessingDB.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IGT.PNRProcessing.BusinessEntities\IGT.PNRProcessing.BusinessEntities.csproj">
-      <Project>{358eca1b-6abf-4cde-9890-0a1222dd3cab}</Project>
-      <Name>IGT.PNRProcessing.BusinessEntities</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,20 +4,20 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="PNRProcessingDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="tblPCCConfigurations">
+      <Schema Namespace="PNRProcessingDBModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="tblPCCConfiguration">
           <Key>
             <PropertyRef Name="PCCID" />
           </Key>
           <Property Name="PCCID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="PCC" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="GDS" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="HAP" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="UserId" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Password" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="GDS" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="URL" Type="varchar" MaxLength="100" Nullable="false" />
         </EntityType>
-        <EntityType Name="tblPNRProcessingTraces">
+        <EntityType Name="tblPNRProcessingTrace">
           <Key>
             <PropertyRef Name="PNRProcessingTraceId" />
           </Key>
@@ -32,7 +32,7 @@
           <Property Name="PNRCaptureDate" Type="datetime" />
           <Property Name="LastModified" Type="datetime" />
         </EntityType>
-        <EntityType Name="tblTicketingFlowConfigurations">
+        <EntityType Name="tblTicketingFlowConfiguration">
           <Key>
             <PropertyRef Name="TicketingflowId" />
           </Key>
@@ -54,38 +54,34 @@
           <Property Name="ScanFrequency" Type="int" Nullable="false" />
         </EntityType>
         <EntityContainer Name="PNRProcessingDBModelStoreContainer">
-          <EntitySet Name="tblPCCConfigurations" EntityType="Self.tblPCCConfigurations" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tblPNRProcessingTraces" EntityType="Self.tblPNRProcessingTraces" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="tblTicketingFlowConfigurations" EntityType="Self.tblTicketingFlowConfigurations" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblPCCConfiguration" EntityType="Self.tblPCCConfiguration" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblPNRProcessingTrace" EntityType="Self.tblPNRProcessingTrace" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tblTicketingFlowConfiguration" EntityType="Self.tblTicketingFlowConfiguration" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="PNRProcessingDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityContainer Name="PNRProcessingDBEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="tblPCCConfigurations" EntityType="PNRProcessingDBModel.tblPCCConfiguration" />
-          <EntitySet Name="tblPNRProcessingTraces" EntityType="PNRProcessingDBModel.tblPNRProcessingTrace" />
-          <EntitySet Name="tblTicketingFlowConfigurations" EntityType="PNRProcessingDBModel.tblTicketingFlowConfiguration" />
-        </EntityContainer>
         <EntityType Name="tblPCCConfiguration">
           <Key>
             <PropertyRef Name="PCCID" />
           </Key>
           <Property Name="PCCID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PCC" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="HAP" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="UserId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Password" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="GDS" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
-          <Property Name="URL" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="PCC" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="GDS" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="HAP" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="UserId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="URL" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
         </EntityType>
         <EntityType Name="tblPNRProcessingTrace">
           <Key>
             <PropertyRef Name="PNRProcessingTraceId" />
           </Key>
-          <Property Name="PNRProcessingTraceId" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Recloc" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="PCC" Type="String" Nullable="false" MaxLength="5" FixedLength="false" Unicode="false" />
+          <Property Name="PNRProcessingTraceId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Recloc" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="PCC" Type="String" MaxLength="5" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Status" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
           <Property Name="IsProcessComplete" Type="Boolean" />
           <Property Name="NoOfFares" Type="Int32" Nullable="false" />
@@ -99,7 +95,7 @@
             <PropertyRef Name="TicketingflowId" />
           </Key>
           <Property Name="TicketingflowId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="TicketingflowName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="TicketingflowName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="PCCID" Type="Int32" Nullable="false" />
           <Property Name="PreFormatedRemark" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="CommissionRemarkFormat" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
@@ -115,60 +111,65 @@
           <Property Name="TargetQNo" Type="Int32" Nullable="false" />
           <Property Name="ScanFrequency" Type="Int32" Nullable="false" />
         </EntityType>
-        </Schema>
+        <EntityContainer Name="Entities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="tblPCCConfigurations" EntityType="Self.tblPCCConfiguration" />
+          <EntitySet Name="tblPNRProcessingTraces" EntityType="Self.tblPNRProcessingTrace" />
+          <EntitySet Name="tblTicketingFlowConfigurations" EntityType="Self.tblTicketingFlowConfiguration" />
+        </EntityContainer>
+      </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="PNRProcessingDBModelStoreContainer" CdmEntityContainer="PNRProcessingDBEntities">
+        <EntityContainerMapping StorageEntityContainer="PNRProcessingDBModelStoreContainer" CdmEntityContainer="Entities">
           <EntitySetMapping Name="tblPCCConfigurations">
             <EntityTypeMapping TypeName="PNRProcessingDBModel.tblPCCConfiguration">
-              <MappingFragment StoreEntitySet="tblPCCConfigurations">
-                <ScalarProperty Name="URL" ColumnName="URL" />
-                <ScalarProperty Name="GDS" ColumnName="GDS" />
-                <ScalarProperty Name="Password" ColumnName="Password" />
-                <ScalarProperty Name="UserId" ColumnName="UserId" />
-                <ScalarProperty Name="HAP" ColumnName="HAP" />
-                <ScalarProperty Name="PCC" ColumnName="PCC" />
+              <MappingFragment StoreEntitySet="tblPCCConfiguration">
                 <ScalarProperty Name="PCCID" ColumnName="PCCID" />
+                <ScalarProperty Name="PCC" ColumnName="PCC" />
+                <ScalarProperty Name="GDS" ColumnName="GDS" />
+                <ScalarProperty Name="HAP" ColumnName="HAP" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tblPNRProcessingTraces">
             <EntityTypeMapping TypeName="PNRProcessingDBModel.tblPNRProcessingTrace">
-              <MappingFragment StoreEntitySet="tblPNRProcessingTraces">
-                <ScalarProperty Name="LastModified" ColumnName="LastModified" />
-                <ScalarProperty Name="PNRCaptureDate" ColumnName="PNRCaptureDate" />
-                <ScalarProperty Name="Error" ColumnName="Error" />
-                <ScalarProperty Name="NoOfTicketedFares" ColumnName="NoOfTicketedFares" />
-                <ScalarProperty Name="NoOfFares" ColumnName="NoOfFares" />
-                <ScalarProperty Name="IsProcessComplete" ColumnName="IsProcessComplete" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="PCC" ColumnName="PCC" />
-                <ScalarProperty Name="Recloc" ColumnName="Recloc" />
+              <MappingFragment StoreEntitySet="tblPNRProcessingTrace">
                 <ScalarProperty Name="PNRProcessingTraceId" ColumnName="PNRProcessingTraceId" />
+                <ScalarProperty Name="Recloc" ColumnName="Recloc" />
+                <ScalarProperty Name="PCC" ColumnName="PCC" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="IsProcessComplete" ColumnName="IsProcessComplete" />
+                <ScalarProperty Name="NoOfFares" ColumnName="NoOfFares" />
+                <ScalarProperty Name="NoOfTicketedFares" ColumnName="NoOfTicketedFares" />
+                <ScalarProperty Name="Error" ColumnName="Error" />
+                <ScalarProperty Name="PNRCaptureDate" ColumnName="PNRCaptureDate" />
+                <ScalarProperty Name="LastModified" ColumnName="LastModified" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="tblTicketingFlowConfigurations">
             <EntityTypeMapping TypeName="PNRProcessingDBModel.tblTicketingFlowConfiguration">
-              <MappingFragment StoreEntitySet="tblTicketingFlowConfigurations">
-                <ScalarProperty Name="ScanFrequency" ColumnName="ScanFrequency" />
-                <ScalarProperty Name="TargetQNo" ColumnName="TargetQNo" />
-                <ScalarProperty Name="FailMsg" ColumnName="FailMsg" />
-                <ScalarProperty Name="FailQNo" ColumnName="FailQNo" />
-                <ScalarProperty Name="SuccessMsg" ColumnName="SuccessMsg" />
-                <ScalarProperty Name="SuccessQNo" ColumnName="SuccessQNo" />
-                <ScalarProperty Name="IsMCTCheck" ColumnName="IsMCTCheck" />
-                <ScalarProperty Name="IsAVLCheck" ColumnName="IsAVLCheck" />
-                <ScalarProperty Name="AllowedFareType" ColumnName="AllowedFareType" />
-                <ScalarProperty Name="AllowedFOP" ColumnName="AllowedFOP" />
-                <ScalarProperty Name="CommissionPct" ColumnName="CommissionPct" />
-                <ScalarProperty Name="CommissionRemarkFormat" ColumnName="CommissionRemarkFormat" />
-                <ScalarProperty Name="PreFormatedRemark" ColumnName="PreFormatedRemark" />
-                <ScalarProperty Name="PCCID" ColumnName="PCCID" />
-                <ScalarProperty Name="TicketingflowName" ColumnName="TicketingflowName" />
+              <MappingFragment StoreEntitySet="tblTicketingFlowConfiguration">
                 <ScalarProperty Name="TicketingflowId" ColumnName="TicketingflowId" />
+                <ScalarProperty Name="TicketingflowName" ColumnName="TicketingflowName" />
+                <ScalarProperty Name="PCCID" ColumnName="PCCID" />
+                <ScalarProperty Name="PreFormatedRemark" ColumnName="PreFormatedRemark" />
+                <ScalarProperty Name="CommissionRemarkFormat" ColumnName="CommissionRemarkFormat" />
+                <ScalarProperty Name="CommissionPct" ColumnName="CommissionPct" />
+                <ScalarProperty Name="AllowedFOP" ColumnName="AllowedFOP" />
+                <ScalarProperty Name="AllowedFareType" ColumnName="AllowedFareType" />
+                <ScalarProperty Name="IsAVLCheck" ColumnName="IsAVLCheck" />
+                <ScalarProperty Name="IsMCTCheck" ColumnName="IsMCTCheck" />
+                <ScalarProperty Name="SuccessQNo" ColumnName="SuccessQNo" />
+                <ScalarProperty Name="SuccessMsg" ColumnName="SuccessMsg" />
+                <ScalarProperty Name="FailQNo" ColumnName="FailQNo" />
+                <ScalarProperty Name="FailMsg" ColumnName="FailMsg" />
+                <ScalarProperty Name="TargetQNo" ColumnName="TargetQNo" />
+                <ScalarProperty Name="ScanFrequency" ColumnName="ScanFrequency" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

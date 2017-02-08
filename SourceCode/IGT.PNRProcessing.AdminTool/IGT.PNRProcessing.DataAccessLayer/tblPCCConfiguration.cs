@@ -16,10 +16,10 @@ namespace IGT.PNRProcessing.DataAccessLayer
     {
         public int PCCID { get; set; }
         public string PCC { get; set; }
+        public string GDS { get; set; }
         public string HAP { get; set; }
         public string UserId { get; set; }
         public string Password { get; set; }
-        public string GDS { get; set; }
         public string URL { get; set; }
     }
 }

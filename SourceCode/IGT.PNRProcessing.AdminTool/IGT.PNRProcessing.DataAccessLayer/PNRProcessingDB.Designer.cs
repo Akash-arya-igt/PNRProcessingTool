@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'D:\Projects\IGT.PNRProcessingTool\PNRProcessingTool\SourceCode\IGT.PNRProcessing.AdminTool\IGT.PNRProcessing.DataAccessLayer\PNRProcessingDB.edmx'. 
+﻿// T4 code generation is enabled for model 'D:\Projects\PNRProcessing\SourceCode\IGT.PNRProcessing.AdminTool\IGT.PNRProcessing.DataAccessLayer\PNRProcessingDB.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.
